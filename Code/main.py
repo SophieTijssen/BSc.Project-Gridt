@@ -1,7 +1,11 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
+import pandas as pd
+import numpy as np
+import random
 
+from mesa.batchrunner import batch_run
 from model import NetworkModel
 
 
@@ -39,16 +43,65 @@ def plotDirectedGraph(mdl):
   plt.show()
 
 
-def main():
-  model = NetworkModel()
+def singleRun():
+  model = NetworkModel(num_of_nodes=100, mu=0.25, sigma=0.1, in_degree=3)
   plotDirectedGraph(model)
 
-  model.run_model()
+  while model.running and model.schedule.steps < 100:
+    model.step()
 
-  state_agents = model.datacollector.get_model_vars_dataframe()
-  # print(state_agents)
-  state_agents.plot()
+  print('The Granovetter Model ran for {} steps'.format(model.schedule.steps))
+  model.datacollector.collect(model)
+
+  agent_out = model.datacollector.get_agent_vars_dataframe()
+
+  agent_out_df = pd.DataFrame(data=agent_out)
+  random_agent = random.choice(range(len(agent_out_df.xs(0))))
+  agent_results = agent_out_df.xs(random_agent, level=1)
+
+  agent_results.plot()
   plt.show()
+
+  model_out = model.datacollector.get_model_vars_dataframe()
+  model_out.plot()
+  plt.show()
+
+
+def batchRun():
+  params = {
+    "num_of_nodes": 100,
+    "mu": 0.25,
+    "sigma": np.linspace(0.0, 1.0, 11),
+    "in_degree": 3
+  }
+
+  results = batch_run(
+    NetworkModel,
+    parameters=params,
+    iterations=10,
+    max_steps=100,
+    number_processes=None,
+    data_collection_period=-1,
+    display_progress=True
+  )
+
+  results_df = pd.DataFrame(results)
+  print(results_df.head())
+
+  # This doesn't do anything
+  results_df.groupby(by=["RunId", "iteration", "Step"]).median()
+  print(results_df.head())
+
+
+def main():
+  single = True
+  if single:
+    # Single Run
+    singleRun()
+
+  else:
+    # Batch Run
+    batchRun()
 
 
 if __name__ == '__main__':
