@@ -9,17 +9,15 @@ from agent import *
 from util import *
 
 
-class NetworkModel(Model):
+class GranovetterModel(Model):
 
   def __init__(self, num_of_nodes=10, mu=0.25, sigma=0.1, in_degree=3):
     super().__init__()
 
     # Initialization
     self.number_of_agents = num_of_nodes
-    self.seed = 13648
-
     self.schedule = SimultaneousActivation(self)
-    self.running = True
+    self.seed = 13648
 
     # Create Network
     in_degree_list = [in_degree] * num_of_nodes
@@ -38,7 +36,7 @@ class NetworkModel(Model):
 
     # Create agents
     for node in list(self.G.nodes()):
-      agent = NetworkAgent(node, self, State.DEFECT, gauss(mu, sigma))
+      agent = GranovetterAgent(node, self, State.DEFECT, gauss(mu, sigma))
       self.schedule.add(agent)
       self.grid.place_agent(agent, node)
 
@@ -55,9 +53,12 @@ class NetworkModel(Model):
       # }
     )
 
+    self.running = True
+
   def step(self):
     self.datacollector.collect(self)
     self.schedule.step()
 
+    # Stop the model if all agents are cooperating
     if number_cooperating(self) == self.schedule.get_agent_count():
       self.running = False
