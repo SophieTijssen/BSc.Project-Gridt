@@ -3,7 +3,6 @@ from mesa.time import RandomActivation, SimultaneousActivation
 from mesa.space import NetworkGrid
 
 import networkx as nx
-from random import gauss
 
 from agent import *
 from util import *
@@ -36,13 +35,13 @@ class GranovetterModel(Model):
 
     # Create agents
     for node in list(self.G.nodes()):
-      agent = GranovetterAgent(node, self, State.DEFECT, gauss(mu, sigma))
+      agent = GranovetterAgent(node, self, State.DEFECT, max(self.random.gauss(mu, sigma), 0.0))
       self.schedule.add(agent)
       self.grid.place_agent(agent, node)
 
-  #   infected_nodes = self.random.sample(list(self.G), self.initial_following)
-  #   for a in self.grid.get_cell_list_contents(infected_nodes):
-  #     a.state = State.COOPERATE
+    # infected_nodes = self.random.sample(list(self.G), self.initial_following)
+    # for a in self.grid.get_cell_list_contents(infected_nodes):
+    #   a.state = State.COOPERATE
 
     self.datacollector = DataCollector(
       model_reporters={"engagement_ratio": get_cooperating_ratio},
