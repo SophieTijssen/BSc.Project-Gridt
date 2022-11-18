@@ -6,20 +6,20 @@ import numpy as np
 import random
 
 from mesa.batchrunner import batch_run
-from model import NetworkModel
+from model import GranovetterModel
 
 
-def plotDirectedGraph(mdl):
-  G = mdl.G
-  pos = nx.spring_layout(G, seed=mdl.seed)
+def plotDirectedGraph(model):
+  G = model.G
+  pos = nx.spring_layout(G, seed=model.seed)
 
-  node_sizes = [3 + 10 * i for i in range(len(G))]
+  node_sizes = [20] * len(G)
   M = G.number_of_edges()
   edge_colors = range(2, M + 2)
   edge_alphas = [(5 + i) / (M + 4) for i in range(M)]
   cmap = plt.cm.plasma
 
-  nodes = nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color="indigo")
+  nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color="indigo")
   edges = nx.draw_networkx_edges(
     G,
     pos,
@@ -34,17 +34,17 @@ def plotDirectedGraph(mdl):
   for i in range(M):
     edges[i].set_alpha(edge_alphas[i])
 
-  pc = mpl.collections.PatchCollection(edges, cmap=cmap)
-  pc.set_array(edge_colors)
+  # pc = mpl.collections.PatchCollection(edges, cmap=cmap)
+  # pc.set_array(edge_colors)
 
   ax = plt.gca()
   ax.set_axis_off()
-  plt.colorbar(pc, ax=ax)
+  # plt.colorbar(pc, ax=ax)
   plt.show()
 
 
 def singleRun():
-  model = NetworkModel(num_of_nodes=100, mu=0.25, sigma=0.1, in_degree=3)
+  model = GranovetterModel(num_of_nodes=100, mu=0.25, sigma=0.1, in_degree=3)
   plotDirectedGraph(model)
 
   while model.running and model.schedule.steps < 100:
@@ -76,7 +76,7 @@ def batchRun():
   }
 
   results = batch_run(
-    NetworkModel,
+    GranovetterModel,
     parameters=params,
     iterations=10,
     max_steps=100,
