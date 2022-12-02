@@ -40,7 +40,9 @@ def plotDirectedGraph(model):
 
 
 def singleRun():
-  model = GranovetterModel(num_of_nodes=100, mu=0.25, sigma=0.3, in_degree=3)
+  # How to choose which can
+  # Normal distribution between 0 and 1: mu=0.5, sigma=0.17
+  model = GranovetterModel(num_of_nodes=100, mu=0.25, sigma=0.15, in_degree=3)
   plotDirectedGraph(model)
 
   while model.running and model.schedule.steps < 100:
@@ -55,10 +57,17 @@ def singleRun():
   agent_out_df = pd.DataFrame(data=agent_out)
   random_agent = random.choice(range(len(agent_out_df.xs(0))))
   # agent_results = agent_out_df.xs(random_agent, level=1)
-  agent_results = agent_out_df.xs(random_agent, level="AgentID").state
+  # agent_results = agent_out_df.xs(random_agent, level="AgentID").state
 
-  agent_results.plot()
-  plt.show()
+  print(agent_out_df.iloc[-1:])
+  maxStep = agent_out_df.index.values[-1:][0][0]
+  print("max step =", maxStep)
+
+  colours = agent_out_df.loc[maxStep].state
+  print(colours)
+
+  # agent_results.plot()
+  # plt.show()
 
   model_out = model.datacollector.get_model_vars_dataframe()
   print(model_out.head())
@@ -72,7 +81,7 @@ def batchRun():
   params = {
     "num_of_nodes": 100,
     "mu": 0.25,
-    "sigma": np.linspace(0.0, 1.0, 11).round(decimals=1),
+    "sigma": np.linspace(0.0, 1.0, 101).round(decimals=2),
     "in_degree": 3
   }
 
@@ -92,13 +101,27 @@ def batchRun():
   results_df.to_csv('results.csv')
 
   # This doesn't do anything
-  tmp = results_df.groupby(by=["RunId", "iteration", "Step"]).median()
-  combined_results = tmp.drop(['num_of_nodes', 'AgentID', 'in_degree', 'mu'], axis=1)
-  combined_results.plot()
-  plt.show()
+  # tmp = results_df.groupby(by=["RunId", "iteration", "Step"]).median()
+  # combined_results = tmp.drop(['num_of_nodes', 'AgentID', 'in_degree', 'mu'], axis=1)
+  # combined_results.plot()
+  # plt.show()
 
   results_df.groupby(by=["RunId"]).median().boxplot(by='sigma', column=['engagement_ratio'], grid=False, rot=45)
   plt.show()
+
+  # print(results_df.groupby(by=["sigma"]).median())
+  # print(results_df.groupby(by=["sigma"]).median().index.values)
+  # print(results_df.groupby(by=["sigma"]).median())
+  # print(results_df.groupby(by=["sigma"]).median()['engagement_ratio'])
+  median_results = results_df.groupby(by=["sigma"]).median()[['engagement_ratio']]
+  median_results.plot()
+  plt.show()
+  mean_results = results_df.groupby(by=["sigma"]).mean()[['engagement_ratio']]
+  mean_results.plot()
+  # plt.plot()
+  plt.show()
+  print(median_results.to_string())
+  print(mean_results.to_string())
 
 
 def main():

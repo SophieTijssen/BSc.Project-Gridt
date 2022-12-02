@@ -21,7 +21,7 @@ class GranovetterAgent(Agent):
     total_agents = self.model.schedule.agents
     cooperating_rate = number_cooperating(self.model) / (len(total_agents) - 1)
 
-    # We let an agent only be aware of the agents thay are linked with
+    # We let an agent only be aware of the agents they are linked with
     # neighbourhood = self.model.grid.get_neighbors(self.pos, include_center=False)
     #
     # if len(neighbourhood) > 0:

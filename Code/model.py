@@ -1,3 +1,5 @@
+import random
+
 from mesa import Model, DataCollector
 from mesa.time import RandomActivation, SimultaneousActivation
 from mesa.space import NetworkGrid
@@ -6,6 +8,8 @@ import networkx as nx
 
 from agent import *
 from util import *
+
+import numpy as np
 
 
 class GranovetterModel(Model):
@@ -17,6 +21,8 @@ class GranovetterModel(Model):
     self.number_of_agents = num_of_nodes
     self.schedule = SimultaneousActivation(self)
     self.seed = 13648
+
+    self.cooperating = 0.0
 
     # Create Network
     in_degree_list = [in_degree] * num_of_nodes
@@ -34,8 +40,21 @@ class GranovetterModel(Model):
     self.grid = NetworkGrid(self.G)
 
     # Create agents
+    # thresholds = [max(self.random.gauss(mu, sigma), 0.0)] * num_of_nodes
+    # print(thresholds)
+    thresholds = np.arange(0.0, 1.0, (1.0/num_of_nodes))
+    thresholds[thresholds == 0.01] = 0.02
+    print(thresholds)
     for node in list(self.G.nodes()):
-      agent = GranovetterAgent(node, self, State.DEFECT, max(self.random.gauss(mu, sigma), 0.0))
+      # threshold = self.random.gauss(mu, sigma)
+      # if threshold > 1.0:
+      #   threshold = 1.0
+      # elif threshold < 0.0:
+      #   threshold = 0.0
+      # print(threshold)
+      # agent = GranovetterAgent(node, self, State.DEFECT, max(self.random.gauss(mu, sigma), 0.0))
+      # agent = GranovetterAgent(node, self, State.DEFECT, threshold)
+      agent = GranovetterAgent(node, self, State.DEFECT, thresholds[node])
       self.schedule.add(agent)
       self.grid.place_agent(agent, node)
 
@@ -61,3 +80,7 @@ class GranovetterModel(Model):
     # Stop the model if all agents are cooperating
     if number_cooperating(self) == self.schedule.get_agent_count():
       self.running = False
+    elif number_cooperating(self) == self.cooperating:
+      self.running = False
+
+    self.cooperating = number_cooperating(self)
