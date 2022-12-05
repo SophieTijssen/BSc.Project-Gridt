@@ -1,5 +1,27 @@
 from enum import Enum
 from random import sample
+import numpy as np
+
+
+class Thresholds:
+  def __init__(self, n, mu, sigmas):
+    self.thresholds = {}
+    self.create_thresholds(n, mu, sigmas)
+
+  def create_thresholds(self, n, mu, sigmas):
+    for sigma in sigmas:
+      threshold = np.random.normal(mu, sigma, n)
+
+      threshold[threshold > 1.0] = 1.0
+      threshold[threshold < 0.0] = 0.0
+
+      self.thresholds[sigma] = threshold
+
+  def getThresholds(self):
+    return self.thresholds
+
+  def setThresholds(self, sigma, thresholds):
+    self.thresholds = {sigma: thresholds}
 
 
 class State(Enum):
@@ -19,7 +41,7 @@ def number_defecting(model):
   return number_state(model, State.DEFECT)
 
 
-def get_cooperating_ratio(model):
+def get_engagement_ratio(model):
   cooperating = number_cooperating(model)
   total_agents = len(model.grid.get_all_cell_contents())
   cooperating_rate = cooperating/total_agents

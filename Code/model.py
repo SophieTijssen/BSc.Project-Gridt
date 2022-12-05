@@ -14,13 +14,16 @@ import numpy as np
 
 class GranovetterModel(Model):
 
-  def __init__(self, num_of_nodes=10, mu=0.25, sigma=0.1, in_degree=3):
+  # def __init__(self, num_of_nodes=10, mu=0.25, sigma=0.1, in_degree=3):
+  def __init__(self, num_of_nodes, sigma, t, in_degree):
     super().__init__()
 
     # Initialization
     self.number_of_agents = num_of_nodes
     self.schedule = SimultaneousActivation(self)
     self.seed = 13648
+
+    self.thresholds = t.getThresholds()
 
     self.cooperating = 0.0
 
@@ -40,11 +43,6 @@ class GranovetterModel(Model):
     self.grid = NetworkGrid(self.G)
 
     # Create agents
-    # thresholds = [max(self.random.gauss(mu, sigma), 0.0)] * num_of_nodes
-    # print(thresholds)
-    thresholds = np.arange(0.0, 1.0, (1.0/num_of_nodes))
-    thresholds[thresholds == 0.01] = 0.02
-    print(thresholds)
     for node in list(self.G.nodes()):
       # threshold = self.random.gauss(mu, sigma)
       # if threshold > 1.0:
@@ -54,7 +52,7 @@ class GranovetterModel(Model):
       # print(threshold)
       # agent = GranovetterAgent(node, self, State.DEFECT, max(self.random.gauss(mu, sigma), 0.0))
       # agent = GranovetterAgent(node, self, State.DEFECT, threshold)
-      agent = GranovetterAgent(node, self, State.DEFECT, thresholds[node])
+      agent = GranovetterAgent(node, self, State.DEFECT, self.thresholds[sigma][node])
       self.schedule.add(agent)
       self.grid.place_agent(agent, node)
 
@@ -63,12 +61,8 @@ class GranovetterModel(Model):
     #   a.state = State.COOPERATE
 
     self.datacollector = DataCollector(
-      model_reporters={"engagement_ratio": get_cooperating_ratio},
+      model_reporters={"engagement_ratio": get_engagement_ratio},
       agent_reporters={"state": "state.value"}
-      # model_reporters={
-      #   "Cooperate": number_cooperating,
-      #   "Defect": number_defecting,
-      # }
     )
 
     self.running = True

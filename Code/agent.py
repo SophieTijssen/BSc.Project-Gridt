@@ -1,6 +1,5 @@
 from mesa import Agent
 
-# from model import NetworkModel
 from util import *
 
 
