@@ -24,9 +24,21 @@ class Thresholds:
     self.thresholds = {sigma: thresholds}
 
 
+class RunType(Enum):
+  Granovetter = 0
+  Single = 1
+  Batch = 2
+
+
 class State(Enum):
   DEFECT = 0
   COOPERATE = 1
+
+
+class Distribution(Enum):
+  NORMAL = 0
+  UNIFORM = 1
+  UNIFORM2 = 2
 
 
 def number_state(model, state):

@@ -1,7 +1,6 @@
-import random
-
 from mesa import Model, DataCollector
-from mesa.time import RandomActivation, SimultaneousActivation
+# TODO: Will we use RandomActivation or SimultaneousActivation
+from mesa.time import SimultaneousActivation
 from mesa.space import NetworkGrid
 
 import networkx as nx
@@ -9,21 +8,26 @@ import networkx as nx
 from agent import *
 from util import *
 
-import numpy as np
-
 
 class GranovetterModel(Model):
 
   # def __init__(self, num_of_nodes=10, mu=0.25, sigma=0.1, in_degree=3):
-  def __init__(self, num_of_nodes, sigma, t, in_degree):
+  def __init__(self, num_of_nodes, distribution, mu, sigma, in_degree):
     super().__init__()
 
     # Initialization
-    self.number_of_agents = num_of_nodes
+    self.num_of_nodes = num_of_nodes
     self.schedule = SimultaneousActivation(self)
     self.seed = 13648
 
-    self.thresholds = t.getThresholds()
+    if distribution == Distribution.NORMAL:
+      self.thresholds = self.createThresholds(mu, sigma)
+
+    else:  # distribution == Distribution.UNIFORM or distribution == Distribution.UNIFORM2
+      self.thresholds = np.arange(0.0, 1.0, (1.0 / self.num_of_nodes))
+
+      if distribution == Distribution.UNIFORM2:
+        self.thresholds[self.thresholds == 0.01] = 0.02
 
     self.cooperating = 0.0
 
@@ -44,15 +48,7 @@ class GranovetterModel(Model):
 
     # Create agents
     for node in list(self.G.nodes()):
-      # threshold = self.random.gauss(mu, sigma)
-      # if threshold > 1.0:
-      #   threshold = 1.0
-      # elif threshold < 0.0:
-      #   threshold = 0.0
-      # print(threshold)
-      # agent = GranovetterAgent(node, self, State.DEFECT, max(self.random.gauss(mu, sigma), 0.0))
-      # agent = GranovetterAgent(node, self, State.DEFECT, threshold)
-      agent = GranovetterAgent(node, self, State.DEFECT, self.thresholds[sigma][node])
+      agent = GranovetterAgent(node, self, State.DEFECT, self.thresholds[node])
       self.schedule.add(agent)
       self.grid.place_agent(agent, node)
 
@@ -78,3 +74,11 @@ class GranovetterModel(Model):
       self.running = False
 
     self.cooperating = number_cooperating(self)
+
+  def createThresholds(self, mu, sigma):
+    thresholds = np.random.normal(mu, sigma, self.num_of_nodes)
+
+    thresholds[thresholds > 1.0] = 1.0
+    thresholds[thresholds < 0.0] = 0.0
+
+    return thresholds
