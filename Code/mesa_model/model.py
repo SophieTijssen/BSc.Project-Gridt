@@ -1,23 +1,33 @@
 from mesa import Model, DataCollector
 from mesa.time import SimultaneousActivation
 from mesa.space import NetworkGrid
-import networkx as nx
+import numpy as np
 
-from agent import *
-from util import *
+from mesa_model.agent import *
+from utilities.model_util import *
+from utilities.network_util import *
+from utilities.threshold_util import createThresholds
 
 
 class GranovetterModel(Model):
 
-  def __init__(self, num_of_nodes, distribution, mu, sigma, in_degree):
+  def __init__(self, num_of_nodes, network, neighbourhood, distribution, mu, sigma, in_degree):
     """
-    Initialisation of the model
+    Initialisation of the model.
+
+    :param num_of_nodes: Number of agents (or nodes) in the network.
+    :param network: The type of network used for the model (directed/undirected).
+    :param neighbourhood: Boolean that shows whether an agent can see the whole network or only its neighbourhood.
+    :param distribution: The type of distribution used to sample the agent thresholds.
+    :param mu: The mean of the threshold distribution
+    :param sigma: The standard deviation of the threshold distribution.
+    :param in_degree: The in-degree of each node in the network.
     """
     super().__init__()
 
     # Initialization
     self.num_of_nodes = num_of_nodes
-    self.seed = 13648
+    self.seed = 13648  # TODO: Use random seed?? Or use same seed for every iteration?
     self.schedule = SimultaneousActivation(self)
     self.cooperating = 0.0
     self.running = True
@@ -28,9 +38,8 @@ class GranovetterModel(Model):
     )
 
     # Create agent thresholds.
-    # if distribution == Distribution.NORMAL:
     if distribution == 0:  # We use a normal distribution.
-      self.thresholds = self.createThresholds(mu, sigma)
+      self.thresholds = createThresholds(num_of_nodes, mu, sigma)
 
     else:  # We use a (modified) uniform distribution.
       self.thresholds = np.arange(0.0, 1.0, (1.0 / self.num_of_nodes))
@@ -39,22 +48,18 @@ class GranovetterModel(Model):
         self.thresholds[self.thresholds == 0.01] = 0.02
 
     # Create network (and grid) with set in-degree and random out-degree.
-    in_degree_list = [in_degree] * num_of_nodes
-    out_degree_list = constrained_sum_sample_pos(num_of_nodes, sum(in_degree_list))
+    G = createDirectedNetwork(self.num_of_nodes, in_degree)
 
-    self.G = nx.directed_configuration_model(
-      in_degree_sequence=in_degree_list,
-      out_degree_sequence=out_degree_list,
-      create_using=nx.DiGraph,
-      # seed=self.seed
-    )
-    self.G.remove_edges_from(nx.selfloop_edges(self.G))
+    if network == 1:  # Use an undirected network
+      self.G = convertToUndirectedNetwork(G)
+    else:  # Use a directed network
+      self.G = G
 
     self.grid = NetworkGrid(self.G)
 
     # Create agents
     for node in list(self.G.nodes()):
-      agent = GranovetterAgent(node, self, State.DEFECT, self.thresholds[node])
+      agent = GranovetterAgent(node, self, neighbourhood, State.DEFECT, self.thresholds[node])
       self.schedule.add(agent)
       self.grid.place_agent(agent, node)
 
@@ -63,7 +68,6 @@ class GranovetterModel(Model):
     A single step of the model.
     The step function of all the agents is activated in the order
     specified by the scheduler and data is collected by the DataCollector.
-
     """
     self.datacollector.collect(self)
     self.schedule.step()
@@ -75,18 +79,3 @@ class GranovetterModel(Model):
       self.running = False
 
     self.cooperating = number_cooperating(self)
-
-  def createThresholds(self, mu, sigma):
-    """
-    Sample agent thresholds from a normal distribution.
-
-    :param mu: Mean value of the normal distribution
-    :param sigma: Standard deviation of the normal distribution
-    :return: Numpy array of thresholds
-    """
-    thresholds = np.random.normal(mu, sigma, self.num_of_nodes)
-
-    thresholds[thresholds > 1.0] = 1.0
-    thresholds[thresholds < 0.0] = 0.0
-
-    return thresholds
