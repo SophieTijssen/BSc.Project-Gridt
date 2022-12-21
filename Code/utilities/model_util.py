@@ -1,15 +1,4 @@
 from enum import Enum
-from random import sample
-import numpy as np
-
-
-class RunType(Enum):
-  """
-  Enumerate class for the possible run types.
-  """
-  Granovetter = 0
-  Single = 1
-  Batch = 2
 
 
 class State(Enum):
@@ -18,37 +7,6 @@ class State(Enum):
   """
   DEFECT = 0
   COOPERATE = 1
-
-
-class Distribution(Enum):
-  """
-  Enumerate class for the different distributions
-  that can be used to sample the agent thresholds.
-  """
-  NORMAL = 0
-  UNIFORM = 1
-  UNIFORM_MODIFIED = 2
-
-
-# class Thresholds:
-#   def __init__(self, n, mu, sigmas):
-#     self.thresholds = {}
-#     self.create_thresholds(n, mu, sigmas)
-#
-#   def create_thresholds(self, n, mu, sigmas):
-#     for sigma in sigmas:
-#       threshold = np.random.normal(mu, sigma, n)
-#
-#       threshold[threshold > 1.0] = 1.0
-#       threshold[threshold < 0.0] = 0.0
-#
-#       self.thresholds[sigma] = threshold
-#
-#   def getThresholds(self):
-#     return self.thresholds
-#
-#   def setThresholds(self, sigma, thresholds):
-#     self.thresholds = {sigma: thresholds}
 
 
 def number_state(model, state):
@@ -93,15 +51,3 @@ def get_engagement_ratio(model):
   total_agents = len(model.grid.get_all_cell_contents())
   cooperating_rate = cooperating/total_agents
   return cooperating_rate
-
-
-def constrained_sum_sample_pos(n, total):
-  """
-  Return a randomly chosen list of n positive integers summing to total.
-  Each such list is equally likely to occur.
-
-  source: https://stackoverflow.com/a/3590105
-  """
-
-  dividers = sorted(sample(range(1, total), n - 1))
-  return [a - b for a, b in zip(dividers + [total], [0] + dividers)]
