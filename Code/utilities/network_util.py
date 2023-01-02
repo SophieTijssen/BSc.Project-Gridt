@@ -2,6 +2,8 @@ import networkx as nx
 from enum import Enum
 from random import sample
 
+from utilities.threshold_util import createThresholds
+
 
 class NetworkType(Enum):
   """
@@ -9,6 +11,50 @@ class NetworkType(Enum):
   """
   UNDIRECTED = 0
   DIRECTED = 1
+
+
+class NetworkData:
+  def __init__(self):
+    """
+
+    """
+    self.n = 0
+    self.network = None
+    self.thresholds = []
+
+  def createNewNetwork(self, networkType, n, in_degree, distributionType, mu, sigma):
+    """
+
+    :param networkType:
+    :param n:
+    :param in_degree:
+    :param distributionType:
+    :param mu:
+    :param sigma:
+    """
+    self.n = n
+
+    self.network = createDirectedNetwork(n, in_degree)
+
+    if networkType == NetworkType.UNDIRECTED:
+      self.convertNetwork()
+
+    self.generateNewThresholds(distributionType, mu, sigma)
+
+  def convertNetwork(self):
+    """
+
+    """
+    self.network = convertToUndirectedNetwork(self.network)
+
+  def generateNewThresholds(self, distributionType, mu, sigma):
+    """
+
+    :param distributionType:
+    :param mu:
+    :param sigma:
+    """
+    self.thresholds = createThresholds(distributionType, self.n, mu, sigma)
 
 
 def constrained_sum_sample_pos(n, total):
@@ -56,4 +102,5 @@ def convertToUndirectedNetwork(G):
   :return: An undirected networkx Graph.
   """
   G.to_undirected()
+
   return G
