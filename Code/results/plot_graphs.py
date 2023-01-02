@@ -169,11 +169,12 @@ def singleRunPlot(results, titleSpecification):
   plt.show()
 
 
-def multipleRunPlot(results, titleSpecification):
+def multipleRunPlot(results, maxSteps, titleSpecification):
   """
   Plot the progression of engaged agents for multiple simulations.
 
   :param results: The results from a batch run.
+  :param maxSteps:
   :param titleSpecification: Specification of the title to add at the end of the standard title.
   """
 
@@ -184,7 +185,7 @@ def multipleRunPlot(results, titleSpecification):
   for value in results.iteration.unique():
     x = results[results['iteration'] == value].Step
     y = results[results['iteration'] == value].engagement_ratio
-    ax.plot(x, y, label=value, color='#EE0000')
+    ax.plot(x, y, label=value)  # , color='#EE0000')
 
   plt.title('Progression of agent engagement' + titleSpecification)
   plt.xlabel('Steps')
@@ -195,5 +196,6 @@ def multipleRunPlot(results, titleSpecification):
   ax.get_yaxis().set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=1))
   fig.set(facecolor='white')
 
+  plt.xlim(0, maxSteps)
   plt.legend()
   plt.show()

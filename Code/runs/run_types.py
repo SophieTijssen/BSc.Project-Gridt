@@ -1,21 +1,9 @@
-from enum import Enum
-
 from mesa.batchrunner import batch_run
 from mesa_model.granovetter_model import GranovetterModel
 from mesa_model.neighbourhood_model import NeighbourhoodModel
 from results.plot_graphs import *
+from utilities.model_util import RunType
 from utilities.network_util import NetworkData
-
-
-class RunType(Enum):
-  """
-  Enumerate class for the possible runs types.
-  """
-  Granovetter = 0
-  NetworkComparison = 1
-  Single = 2
-  Batch = 3
-  Neighbourhood = 5
 
 
 def singleRun(run, n, network, neighbourhood, distribution, mu, sigma, in_degree, networkData, titleSpecification):
@@ -38,7 +26,7 @@ def singleRun(run, n, network, neighbourhood, distribution, mu, sigma, in_degree
     model = GranovetterModel(num_of_nodes=n, networkType=network.value, distributionType=distribution.value,
                              mu=mu, sigma=sigma, in_degree=in_degree)
   else:
-    model = NeighbourhoodModel(num_of_nodes=n, neighbourhood=neighbourhood, networkType=network.value,
+    model = NeighbourhoodModel(run=run, num_of_nodes=n, neighbourhood=neighbourhood, networkType=network.value,
                                distributionType=distribution.value, mu=mu, sigma=sigma, in_degree=in_degree,
                                networkData=networkData)
 
@@ -94,10 +82,11 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
   return results_df
 
 
-def batchRunNeighbourhood(n, i, networks, neighbourhoods, distributions, mu, sigmas, in_degree):
+def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, distributions, mu, sigmas, in_degree):
   """
   Run the model for multiple iterations (using BatchRun).
 
+  :param run:
   :param n: The number of agents in the network.
   :param i: The number of iterations of the batch run.
   :param networks: The type of network used for the model (directed/undirected).
@@ -116,6 +105,7 @@ def batchRunNeighbourhood(n, i, networks, neighbourhoods, distributions, mu, sig
     network_values = networks.value
 
   params = {
+    "run": run.value,
     "num_of_nodes": n,
     "networkType": network_values,
     "neighbourhood": neighbourhoods,
