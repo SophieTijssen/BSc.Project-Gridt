@@ -85,7 +85,7 @@ def plotDirectedGraph(model):
   plt.show()
 
 
-def SigmaPlot(results):
+def sigmaPlot(results):
   """
   Plot a boxplot showing the engagement ratio for each sigma.
 
@@ -94,29 +94,69 @@ def SigmaPlot(results):
 
   plt.style.use(style)
 
-  # TODO: Format the graphs and choose whether to use median or mean results.
+  # TODO: Choose whether to use median or mean results.
+
+  # Median
   median_results = results.groupby(by=["sigma"]).median()[['engagement_ratio']]
-  median_results.plot()
+
+  fig = median_results.plot(color='#EE0000')
   plt.axvline(x=0.12, linestyle='dashed', color='gray')
+
+  plt.title('Median agent engagement for normal distributions with varying sigmas')
+  plt.xlabel('Sigma')
+  plt.ylabel('Percentage of engaged agents')
+
+  # https://stackoverflow.com/questions/62610215/percentage-sign-in-matplotlib-on-y-axis
+  # https://matplotlib.org/stable/api/ticker_api.html
+  fig.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=0))
+
   plt.show()
 
+  # Mean
   mean_results = results.groupby(by=["sigma"]).mean()[['engagement_ratio']]
-  mean_results.plot()
+
+  fig_mean = mean_results.plot(color='#EE0000')
+  plt.axvline(x=0.12, linestyle='dashed', color='gray')
+
+  plt.title('Mean agent engagement for normal distributions with varying sigmas')
+  plt.xlabel('Sigma')
+  plt.ylabel('Percentage of engaged agents')
+
+  # https://stackoverflow.com/questions/62610215/percentage-sign-in-matplotlib-on-y-axis
+  # https://matplotlib.org/stable/api/ticker_api.html
+  fig_mean.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=0))
+  fig_mean.xaxis.set_ticks(np.arange(0.0, 1.1, 0.1))
+
   plt.show()
 
 
-def plotEngagementProgression(results):
+def sigmaBoxPlot(results):
   """
-  Plot the progression of engaged agents during the simulation.
+  Plot a boxplot of the engagement equilibrium for every sigma.
 
-  :param results: The results from a single or batch run.
+  :param results: The results from a batch run.
   """
 
   plt.style.use(style)
 
-  fig = results.plot()  # color='#EE0000')
+  results.groupby(by=["RunId"]).median().boxplot(by='sigma', column=['engagement_ratio'], grid=False, rot=45)
 
-  plt.title('Progression of engagements of agents')
+  plt.show()
+
+
+def singleRunPlot(results, titleSpecification):
+  """
+  Plot the progression of engaged agents during a single simulation.
+
+  :param results: The results from a single run.
+  :param titleSpecification: Specification of the title to add at the end of the standard title.
+  """
+
+  plt.style.use(style)
+
+  fig = results.plot(color='#EE0000')
+
+  plt.title('Progression of agent engagement' + titleSpecification)
   plt.xlabel('Steps')
   plt.ylabel('Percentage of engaged agents')
 
@@ -129,13 +169,31 @@ def plotEngagementProgression(results):
   plt.show()
 
 
-def sigmaBoxPlot(results):
+def multipleRunPlot(results, titleSpecification):
   """
-  Plot a boxplot of the engagement equilibrium for every sigma.
+  Plot the progression of engaged agents for multiple simulations.
 
   :param results: The results from a batch run.
+  :param titleSpecification: Specification of the title to add at the end of the standard title.
   """
-  results.groupby(by=["RunId"]).median().boxplot(by='sigma', column=['engagement_ratio'], grid=False, rot=45)
 
   plt.style.use(style)
+
+  fig, ax = plt.subplots()
+
+  for value in results.iteration.unique():
+    x = results[results['iteration'] == value].Step
+    y = results[results['iteration'] == value].engagement_ratio
+    ax.plot(x, y, label=value, color='#EE0000')
+
+  plt.title('Progression of agent engagement' + titleSpecification)
+  plt.xlabel('Steps')
+  plt.ylabel('Percentage of engaged agents')
+
+  # https://stackoverflow.com/questions/62610215/percentage-sign-in-matplotlib-on-y-axis
+  # https://matplotlib.org/stable/api/ticker_api.html
+  ax.get_yaxis().set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=1))
+  fig.set(facecolor='white')
+
+  plt.legend()
   plt.show()
