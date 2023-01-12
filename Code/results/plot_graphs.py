@@ -4,6 +4,8 @@ import numpy as np
 import networkx as nx
 import matplotlib.ticker as mtick
 
+from utilities.network_util import NetworkType, KnowledgeType
+
 style = 'seaborn-poster'
 
 
@@ -12,6 +14,7 @@ def showDegreeHistogram(G, specification):
   Plot a degree histogram showing the in- and out-degree.
 
   :param G: The network used in the mesa model.
+  :param specification:
   """
 
   in_degrees = [val for (node, val) in G.in_degree()]
@@ -26,7 +29,7 @@ def showDegreeHistogram(G, specification):
   plt.legend(loc='upper right')
 
   plt.savefig('results/figures/degree_histogram_' + specification + '.png')
-  plt.show()
+  plt.close()
 
 
 def getNodeColours(model):
@@ -52,6 +55,7 @@ def plotDirectedGraph(model, specification):
   source: https://networkx.org/documentation/stable/auto_examples/drawing/plot_directed.html
 
   :param model: The mesa model
+  :param specification:
   """
 
   G = model.G
@@ -86,7 +90,7 @@ def plotDirectedGraph(model, specification):
   ax.set_axis_off()
 
   plt.savefig('results/figures/network_visualisation_' + specification + '.png')
-  plt.show()
+  plt.close()
 
 
 def sigmaPlot(results):
@@ -97,8 +101,6 @@ def sigmaPlot(results):
   """
 
   plt.style.use(style)
-
-  # TODO: Choose whether to use median or mean results.
 
   # Median
   median_results = results.groupby(by=["sigma"]).median()[['engagement_ratio']]
@@ -115,7 +117,7 @@ def sigmaPlot(results):
   fig.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=0))
 
   plt.savefig('results/figures/granovetter_sigma.png')
-  # plt.show()
+  plt.close()
 
   # # Mean
   # mean_results = results.groupby(by=["sigma"]).mean()[['engagement_ratio']]
@@ -132,7 +134,8 @@ def sigmaPlot(results):
   # fig_mean.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=0))
   # fig_mean.xaxis.set_ticks(np.arange(0.0, 1.1, 0.1))
   #
-  # plt.show()
+  # plt.savefig('results/figures/mean_granovetter_sigma.png')
+  # plt.close()
 
 
 def sigmaBoxPlot(results):
@@ -147,7 +150,7 @@ def sigmaBoxPlot(results):
   results.groupby(by=["RunId"]).median().boxplot(by='sigma', column=['engagement_ratio'], grid=False, rot=45)
 
   plt.savefig('results/figures/sigma_boxplot.png')
-  plt.show()
+  plt.close()
 
 
 def singleRunPlot(results, titleSpecification, filename):
@@ -156,6 +159,7 @@ def singleRunPlot(results, titleSpecification, filename):
 
   :param results: The results from a single run.
   :param titleSpecification: Specification of the title to add at the end of the standard title.
+  :param filename:
   """
 
   plt.style.use(style)
@@ -173,7 +177,7 @@ def singleRunPlot(results, titleSpecification, filename):
   fig.get_legend().remove()
 
   plt.savefig('results/figures/' + filename + '.png')
-  plt.show()
+  plt.close()
 
 
 def multipleRunPlot(results, maxSteps, titleSpecification, filename):
@@ -183,6 +187,7 @@ def multipleRunPlot(results, maxSteps, titleSpecification, filename):
   :param results: The results from a batch run.
   :param maxSteps:
   :param titleSpecification: Specification of the title to add at the end of the standard title.
+  :param filename:
   """
 
   plt.style.use(style)
@@ -192,7 +197,7 @@ def multipleRunPlot(results, maxSteps, titleSpecification, filename):
   for value in results.iteration.unique():
     x = results[results['iteration'] == value].Step
     y = results[results['iteration'] == value].engagement_ratio
-    ax.plot(x, y, label=value)  # , color='#EE0000')
+    ax.plot(x, y, label=value)
 
   plt.title('Progression of agent engagement' + titleSpecification)
   plt.xlabel('Steps')
@@ -207,4 +212,58 @@ def multipleRunPlot(results, maxSteps, titleSpecification, filename):
   plt.legend()
 
   plt.savefig('results/figures/' + filename + '.png')
-  plt.show()
+  plt.close()
+
+
+def comparisonPlot(results, titleSpecification, filename, variable):
+  """
+  Plot the progression of engaged agents for multiple simulations.
+
+  :param results: The results from a batch run.
+  :param titleSpecification: Specification of the title to add at the end of the standard title.
+  :param filename:
+  :param variable:
+  """
+
+  plt.style.use(style)
+
+  maxSteps = max(results['Step'])
+
+  def labelConversion(label):
+    if variable == 'neighbourhood':
+      # if value:
+      #   return 'neighbourhood'
+      # else:
+      #   return 'whole network'
+      print(label)
+      print(KnowledgeType(label).name)
+      return KnowledgeType(label).name
+
+    if variable == 'networkType':
+      return NetworkType(label).name
+
+  for i in results.iteration.unique():
+
+    fig, ax = plt.subplots()
+
+    results_i = results[results['iteration'] == i]
+
+    for value in results[variable].unique():
+      x = results_i[results_i[variable] == value].Step
+      y = results_i[results_i[variable] == value].engagement_ratio
+      ax.plot(x, y, label=labelConversion(value))
+
+    plt.title('Progression of agent engagement' + titleSpecification + "(iteration: " + str(i) + ", variable: " + str(variable) + ")")
+    plt.xlabel('Steps')
+    plt.ylabel('Percentage of engaged agents')
+
+    # https://stackoverflow.com/questions/62610215/percentage-sign-in-matplotlib-on-y-axis
+    # https://matplotlib.org/stable/api/ticker_api.html
+    ax.get_yaxis().set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=1))
+    fig.set(facecolor='white')
+
+    plt.xlim(0, maxSteps)
+    plt.legend(loc='upper left')
+
+    plt.savefig('results/figures/' + filename + '_' + variable + '(' + str(i) + ').png')
+    plt.close()

@@ -46,7 +46,7 @@ class NeighbourhoodModel(GranovetterModel):
     check = []
     for agent in self.schedule.agents:
       neighbourhood = self.grid.get_neighbors(agent.unique_id, include_center=False)
-      print(self.networkType, ":", "agent", agent.unique_id, "=", neighbourhood)
+      # print(self.networkType, ":", "agent", agent.unique_id, "=", neighbourhood)
 
       # if self.networkType == NetworkType.UNDIRECTED.value:
       #   for neighbour in neighbourhood:

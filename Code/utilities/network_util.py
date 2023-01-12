@@ -13,6 +13,14 @@ class NetworkType(Enum):
   DIRECTED = 1
 
 
+class KnowledgeType(Enum):
+  """
+  Enumerate class for the different network types.
+  """
+  Network = False
+  Neighbourhood = True
+
+
 class NetworkData:
   def __init__(self):
     """

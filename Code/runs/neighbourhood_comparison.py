@@ -42,10 +42,11 @@ def runNeighbourhoodComparison(n, i, mu, sigma, in_degree):
     results_neighbourhood.to_csv('results/raw_data/results_neighbourhood.csv')
 
     maxSteps = max(max(results_whole_network['Step']), max(results_neighbourhood['Step'])) + 1
-    print(maxSteps)
 
     multipleRunPlot(results_whole_network, maxSteps, ' with network information available', 'whole_network')
     multipleRunPlot(results_neighbourhood, maxSteps, ' with neighbourhood information available', 'neighbourhood')
+
+    comparisonPlot(results, 'neighbourhood', 'whole_network_', 'neighbourhood')
 
   else:
     networkData = NetworkData()
