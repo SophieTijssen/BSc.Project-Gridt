@@ -6,7 +6,7 @@ from utilities.model_util import RunType
 from utilities.network_util import NetworkData
 
 
-def singleRun(run, n, network, neighbourhood, distribution, mu, sigma, in_degree, networkData, titleSpecification):
+def singleRun(run, n, network, neighbourhood, utility, distribution, mu, sigma, in_degree, networkData, titleSpecification, filename):
   """
   Run the model for a single iteration.
 
@@ -26,7 +26,7 @@ def singleRun(run, n, network, neighbourhood, distribution, mu, sigma, in_degree
     model = GranovetterModel(num_of_nodes=n, networkType=network.value, distributionType=distribution.value,
                              mu=mu, sigma=sigma, in_degree=in_degree)
   else:
-    model = NeighbourhoodModel(run=run, num_of_nodes=n, neighbourhood=neighbourhood, networkType=network.value,
+    model = NeighbourhoodModel(run=run.value, num_of_nodes=n, neighbourhood=neighbourhood, utility=utility, networkType=network.value,
                                distributionType=distribution.value, mu=mu, sigma=sigma, in_degree=in_degree,
                                networkData=networkData)
 
@@ -36,11 +36,11 @@ def singleRun(run, n, network, neighbourhood, distribution, mu, sigma, in_degree
   model.datacollector.collect(model)
   model_out = model.datacollector.get_model_vars_dataframe()
 
-  plotDirectedGraph(model)
+  plotDirectedGraph(model, filename)
 
-  showDegreeHistogram(model.G)
+  showDegreeHistogram(model.G, filename)
 
-  singleRunPlot(model_out, titleSpecification)
+  singleRunPlot(model_out, titleSpecification, filename)
 
 
 def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
@@ -82,7 +82,7 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
   return results_df
 
 
-def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, distributions, mu, sigmas, in_degree):
+def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, utility, distribution, mu, sigmas, in_degree):
   """
   Run the model for multiple iterations (using BatchRun).
 
@@ -91,7 +91,7 @@ def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, distributions, mu
   :param i: The number of iterations of the batch run.
   :param networks: The type of network used for the model (directed/undirected).
   :param neighbourhoods: Boolean that shows whether an agent can see the whole network or only its neighbourhood.
-  :param distributions: The distribution used for sampling the agent thresholds.
+  :param distribution: The distribution used for sampling the agent thresholds.
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
   :param sigmas: A list containing the standard deviations of the threshold distributions
                  for each iteration (in case of a normal distribution).
@@ -109,7 +109,8 @@ def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, distributions, mu
     "num_of_nodes": n,
     "networkType": network_values,
     "neighbourhood": neighbourhoods,
-    "distributionType": distributions.value,
+    "utility": utility,
+    "distributionType": distribution.value,
     "mu": mu,
     "sigma": sigmas,
     "in_degree": in_degree,

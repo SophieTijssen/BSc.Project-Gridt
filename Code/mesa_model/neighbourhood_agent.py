@@ -1,5 +1,3 @@
-from mesa import Agent
-
 from mesa_model.granovetter_agent import GranovetterAgent
 from utilities.model_util import *
 
@@ -17,10 +15,24 @@ class NeighbourhoodAgent(GranovetterAgent):
     :param cooperate_threshold: The cooperating threshold of the agent.
     """
 
-    super().__init__(unique_id, model, initial_state, cooperate_threshold)
-
     self.neighbourhood = neighbourhood
     self.cooperating = False
+
+    super().__init__(unique_id, model, initial_state, cooperate_threshold)
+
+  def getState(self):
+    """
+
+    :return:
+    """
+    return self.state
+
+  def getThreshold(self):
+    """
+
+    :return:
+    """
+    return self.cooperate_threshold
 
   def step(self):
     """

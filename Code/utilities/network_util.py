@@ -41,10 +41,13 @@ class NetworkData:
 
     self.generateNewThresholds(distributionType, mu, sigma)
 
+    print("directed: ", self.network)
+
   def convertNetwork(self):
     """
 
     """
+    print("Convert network is called")
     self.network = convertToUndirectedNetwork(self.network)
 
   def generateNewThresholds(self, distributionType, mu, sigma):
@@ -59,7 +62,7 @@ class NetworkData:
 
 def constrained_sum_sample_pos(n, total):
   """
-  Return a randomly chosen list of n positive integers summing to total.
+  Return a randomly chosen list of n positive integers summing to a total.
   Each such list is equally likely to occur.
   source: https://stackoverflow.com/a/3590105
 
@@ -80,8 +83,11 @@ def createDirectedNetwork(n, in_degree):
   :param in_degree: The in-degree of a node in the network.
   :return: A networkx DiGraph.
   """
-  in_degree_list = [in_degree] * n
-  out_degree_list = constrained_sum_sample_pos(n, sum(in_degree_list))
+  # in_degree_list = [in_degree] * n
+  # out_degree_list = constrained_sum_sample_pos(n, sum(in_degree_list))
+
+  out_degree_list = [in_degree] * n
+  in_degree_list = constrained_sum_sample_pos(n, sum(out_degree_list))
 
   G = nx.directed_configuration_model(
     in_degree_sequence=in_degree_list,
@@ -101,6 +107,8 @@ def convertToUndirectedNetwork(G):
   :param G: An undirected network.
   :return: An undirected networkx Graph.
   """
-  G.to_undirected()
 
-  return G
+  H = G.to_undirected()
+  print("undirected: ", H)
+
+  return H

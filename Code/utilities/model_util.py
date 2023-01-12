@@ -10,6 +10,7 @@ class RunType(Enum):
   Single = 2
   Batch = 3
   Neighbourhood = 5
+  Utility = 6
 
 
 class State(Enum):

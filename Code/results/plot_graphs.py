@@ -7,7 +7,7 @@ import matplotlib.ticker as mtick
 style = 'seaborn-poster'
 
 
-def showDegreeHistogram(G):
+def showDegreeHistogram(G, specification):
   """
   Plot a degree histogram showing the in- and out-degree.
 
@@ -24,6 +24,8 @@ def showDegreeHistogram(G):
 
   plt.hist([d1, d2], label=['in-degrees', 'out-degrees'], align='left')
   plt.legend(loc='upper right')
+
+  plt.savefig('results/figures/degree_histogram_' + specification + '.png')
   plt.show()
 
 
@@ -44,7 +46,7 @@ def getNodeColours(model):
   return colours
 
 
-def plotDirectedGraph(model):
+def plotDirectedGraph(model, specification):
   """
   Plot the network used in the mesa model.
   source: https://networkx.org/documentation/stable/auto_examples/drawing/plot_directed.html
@@ -82,6 +84,8 @@ def plotDirectedGraph(model):
 
   ax = plt.gca()
   ax.set_axis_off()
+
+  plt.savefig('results/figures/network_visualisation_' + specification + '.png')
   plt.show()
 
 
@@ -110,24 +114,25 @@ def sigmaPlot(results):
   # https://matplotlib.org/stable/api/ticker_api.html
   fig.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=0))
 
-  plt.show()
+  plt.savefig('results/figures/granovetter_sigma.png')
+  # plt.show()
 
-  # Mean
-  mean_results = results.groupby(by=["sigma"]).mean()[['engagement_ratio']]
-
-  fig_mean = mean_results.plot(color='#EE0000')
-  plt.axvline(x=0.12, linestyle='dashed', color='gray')
-
-  plt.title('Mean agent engagement for normal distributions with varying sigmas')
-  plt.xlabel('Sigma')
-  plt.ylabel('Percentage of engaged agents')
-
-  # https://stackoverflow.com/questions/62610215/percentage-sign-in-matplotlib-on-y-axis
-  # https://matplotlib.org/stable/api/ticker_api.html
-  fig_mean.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=0))
-  fig_mean.xaxis.set_ticks(np.arange(0.0, 1.1, 0.1))
-
-  plt.show()
+  # # Mean
+  # mean_results = results.groupby(by=["sigma"]).mean()[['engagement_ratio']]
+  #
+  # fig_mean = mean_results.plot(color='#EE0000')
+  # plt.axvline(x=0.12, linestyle='dashed', color='gray')
+  #
+  # plt.title('Mean agent engagement for normal distributions with varying sigmas')
+  # plt.xlabel('Sigma')
+  # plt.ylabel('Percentage of engaged agents')
+  #
+  # # https://stackoverflow.com/questions/62610215/percentage-sign-in-matplotlib-on-y-axis
+  # # https://matplotlib.org/stable/api/ticker_api.html
+  # fig_mean.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=0))
+  # fig_mean.xaxis.set_ticks(np.arange(0.0, 1.1, 0.1))
+  #
+  # plt.show()
 
 
 def sigmaBoxPlot(results):
@@ -141,10 +146,11 @@ def sigmaBoxPlot(results):
 
   results.groupby(by=["RunId"]).median().boxplot(by='sigma', column=['engagement_ratio'], grid=False, rot=45)
 
+  plt.savefig('results/figures/sigma_boxplot.png')
   plt.show()
 
 
-def singleRunPlot(results, titleSpecification):
+def singleRunPlot(results, titleSpecification, filename):
   """
   Plot the progression of engaged agents during a single simulation.
 
@@ -166,10 +172,11 @@ def singleRunPlot(results, titleSpecification):
   fig.set(facecolor='white')
   fig.get_legend().remove()
 
+  plt.savefig('results/figures/' + filename + '.png')
   plt.show()
 
 
-def multipleRunPlot(results, maxSteps, titleSpecification):
+def multipleRunPlot(results, maxSteps, titleSpecification, filename):
   """
   Plot the progression of engaged agents for multiple simulations.
 
@@ -198,4 +205,6 @@ def multipleRunPlot(results, maxSteps, titleSpecification):
 
   plt.xlim(0, maxSteps)
   plt.legend()
+
+  plt.savefig('results/figures/' + filename + '.png')
   plt.show()
