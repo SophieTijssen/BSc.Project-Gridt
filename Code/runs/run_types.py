@@ -82,7 +82,7 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
   return results_df
 
 
-def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, utility, distribution, mu, sigmas, in_degree):
+def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, utility, distribution, mu, sigmas, in_degree, collectionPeriod=1):
   """
   Run the model for multiple iterations (using BatchRun).
 
@@ -91,11 +91,13 @@ def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, utility, distribu
   :param i: The number of iterations of the batch run.
   :param networks: The type of network used for the model (directed/undirected).
   :param neighbourhoods: Boolean that shows whether an agent can see the whole network or only its neighbourhood.
+  :param utility:
   :param distribution: The distribution used for sampling the agent thresholds.
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
   :param sigmas: A list containing the standard deviations of the threshold distributions
                  for each iteration (in case of a normal distribution).
   :param in_degree: The in-degree of all agents.
+  :param collectionPeriod:
   :return: A pandas dataframe containing the results/data from the DataCollector.
   """
 
@@ -107,12 +109,12 @@ def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, utility, distribu
   params = {
     "run": run.value,
     "num_of_nodes": n,
+    "sigma": sigmas,
     "networkType": network_values,
     "neighbourhood": neighbourhoods,
     "utility": utility,
     "distributionType": distribution.value,
     "mu": mu,
-    "sigma": sigmas,
     "in_degree": in_degree,
     "networkData": NetworkData()
   }
@@ -123,7 +125,7 @@ def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, utility, distribu
     iterations=i,
     max_steps=100,
     number_processes=1,
-    data_collection_period=1,
+    data_collection_period=collectionPeriod,
     display_progress=True
   )
 

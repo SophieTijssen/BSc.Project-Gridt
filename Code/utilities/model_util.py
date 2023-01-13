@@ -11,6 +11,7 @@ class RunType(Enum):
   Batch = 3
   Neighbourhood = 5
   Utility = 6
+  SigmaComparison = 7
 
 
 class State(Enum):

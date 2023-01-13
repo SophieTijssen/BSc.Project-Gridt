@@ -11,7 +11,7 @@ from utilities.network_util import *
 
 class NeighbourhoodModel(GranovetterModel):
 
-  def __init__(self, run, num_of_nodes, networkType, neighbourhood, utility, distributionType, mu, sigma, in_degree, networkData):
+  def __init__(self, run, num_of_nodes, mu, sigma, in_degree, networkType, neighbourhood, utility, distributionType, networkData):
     """
     Initialisation of the model.
 
@@ -43,7 +43,7 @@ class NeighbourhoodModel(GranovetterModel):
     # self.G, self.thresholds = self.generateNetwork()
     # self.grid = NetworkGrid(self.G)
 
-    check = []
+    # check = []
     for agent in self.schedule.agents:
       neighbourhood = self.grid.get_neighbors(agent.unique_id, include_center=False)
       # print(self.networkType, ":", "agent", agent.unique_id, "=", neighbourhood)
@@ -97,6 +97,9 @@ class NeighbourhoodModel(GranovetterModel):
         # Convert previously used directed network to an undirected network
         print(self.networkType, ": Network converted to undirected network")
         self.networkData.convertNetwork()
+
+    elif self.run == RunType.SigmaComparison.value:
+      self.networkData.generateNewThresholds(self.distributionType, self.mu, self.sigma)
 
     else:
       self.networkData.createNewNetwork(self.networkType, self.num_of_nodes, self.in_degree, self.distributionType, self.mu, self.sigma)

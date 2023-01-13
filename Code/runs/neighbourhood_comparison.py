@@ -43,17 +43,17 @@ def runNeighbourhoodComparison(n, i, mu, sigma, in_degree):
 
     maxSteps = max(max(results_whole_network['Step']), max(results_neighbourhood['Step'])) + 1
 
-    multipleRunPlot(results_whole_network, maxSteps, ' with network information available', 'whole_network')
-    multipleRunPlot(results_neighbourhood, maxSteps, ' with neighbourhood information available', 'neighbourhood')
+    multipleRunPlot(results_whole_network, maxSteps, 'with network information available', 'whole_network')
+    multipleRunPlot(results_neighbourhood, maxSteps, 'with neighbourhood information available', 'neighbourhood')
 
-    comparisonPlot(results, 'neighbourhood', 'whole_network_', 'neighbourhood')
+    comparisonPlot(results, 'neighbourhood_comparison', 'neighbourhood')
 
   else:
     networkData = NetworkData()
     networkData.createNewNetwork(NetworkType.DIRECTED, n, in_degree, Distribution.NORMAL, mu, sigma)
 
     singleRun(RunType.Neighbourhood, n, NetworkType.DIRECTED, False, False, Distribution.NORMAL, mu, sigma, in_degree,
-              networkData, ' with network information available', 'whole_network')
+              networkData, 'with network information available', 'whole_network')
 
     singleRun(RunType.Neighbourhood, n, NetworkType.DIRECTED, True, False, Distribution.NORMAL, mu, sigma, in_degree,
-              networkData, ' with neighbourhood information available', 'neighbourhood')
+              networkData, 'with neighbourhood information available', 'neighbourhood')

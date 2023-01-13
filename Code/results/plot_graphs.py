@@ -1,3 +1,5 @@
+import random
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -138,6 +140,49 @@ def sigmaPlot(results):
   # plt.close()
 
 
+# TODO: Make sure that only the final engagement ratio is used
+def multipleVariablesPlot(results_1, results_2, variable, labels, specification):
+  """
+  Plot a boxplot showing the engagement ratio for each sigma.
+
+  :param results_1:
+  :param results_2: The results from a batch run.
+  :param variable:
+  :param labels:
+  :param specification:
+  """
+
+  plt.style.use(style)
+
+  fig, ax = plt.subplots()
+
+  tmp = pd.DataFrame(results_1.groupby(by=[variable]))
+  print(tmp)
+  tmp.to_csv('results/raw_data/tmp.csv')
+
+  # Median
+  median_results_1 = results_1.groupby(by=[variable]).median()[['engagement_ratio']]
+  print(median_results_1)
+  median_results_2 = results_2.groupby(by=[variable]).median()[['engagement_ratio']]
+
+  ax.plot(median_results_1, label=labels[0])
+  ax.plot(median_results_2, label=labels[1])
+
+  if variable == 'sigma':
+    plt.axvline(x=0.12, linestyle='dashed', color='gray')
+
+  plt.title('Median agent engagement for normal distributions with varying ' + specification)
+  plt.xlabel('Sigma')
+  plt.ylabel('Percentage of engaged agents')
+
+  # https://stackoverflow.com/questions/62610215/percentage-sign-in-matplotlib-on-y-axis
+  # https://matplotlib.org/stable/api/ticker_api.html
+  ax.get_yaxis().set_major_formatter(mtick.PercentFormatter(xmax=1.0, decimals=0))
+
+  plt.savefig('results/figures/network_' + specification + '_comparison.png')
+  plt.close()
+
+
 def sigmaBoxPlot(results):
   """
   Plot a boxplot of the engagement equilibrium for every sigma.
@@ -166,7 +211,7 @@ def singleRunPlot(results, titleSpecification, filename):
 
   fig = results.plot(color='#EE0000')
 
-  plt.title('Progression of agent engagement' + titleSpecification)
+  plt.title('Progression of agent engagement ' + titleSpecification)
   plt.xlabel('Steps')
   plt.ylabel('Percentage of engaged agents')
 
@@ -199,7 +244,7 @@ def multipleRunPlot(results, maxSteps, titleSpecification, filename):
     y = results[results['iteration'] == value].engagement_ratio
     ax.plot(x, y, label=value)
 
-  plt.title('Progression of agent engagement' + titleSpecification)
+  plt.title('Progression of agent engagement ' + titleSpecification)
   plt.xlabel('Steps')
   plt.ylabel('Percentage of engaged agents')
 
@@ -215,12 +260,11 @@ def multipleRunPlot(results, maxSteps, titleSpecification, filename):
   plt.close()
 
 
-def comparisonPlot(results, titleSpecification, filename, variable):
+def comparisonPlot(results, filename, variable):
   """
   Plot the progression of engaged agents for multiple simulations.
 
   :param results: The results from a batch run.
-  :param titleSpecification: Specification of the title to add at the end of the standard title.
   :param filename:
   :param variable:
   """
@@ -242,8 +286,12 @@ def comparisonPlot(results, titleSpecification, filename, variable):
     if variable == 'networkType':
       return NetworkType(label).name
 
-  for i in results.iteration.unique():
+  if len(results.iteration.unique()) < 3:
+    random_i = results.iteration.unique()
+  else:
+    random_i = random.sample(sorted(results.iteration.unique()), k=3)
 
+  for i in random_i:
     fig, ax = plt.subplots()
 
     results_i = results[results['iteration'] == i]
@@ -253,7 +301,7 @@ def comparisonPlot(results, titleSpecification, filename, variable):
       y = results_i[results_i[variable] == value].engagement_ratio
       ax.plot(x, y, label=labelConversion(value))
 
-    plt.title('Progression of agent engagement' + titleSpecification + "(iteration: " + str(i) + ", variable: " + str(variable) + ")")
+    plt.title('Progression of agent engagement ' + "(iteration: " + str(i) + ", variable: " + str(variable) + ")")
     plt.xlabel('Steps')
     plt.ylabel('Percentage of engaged agents')
 
@@ -265,5 +313,5 @@ def comparisonPlot(results, titleSpecification, filename, variable):
     plt.xlim(0, maxSteps)
     plt.legend(loc='upper left')
 
-    plt.savefig('results/figures/' + filename + '_' + variable + '(' + str(i) + ').png')
+    plt.savefig('results/figures/' + filename + '(' + str(random_i.index(i)) + ').png')
     plt.close()

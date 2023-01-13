@@ -2,7 +2,7 @@ import networkx as nx
 from enum import Enum
 from random import sample
 
-from utilities.threshold_util import createThresholds
+from utilities.threshold_util import createThresholds, Distribution
 
 
 class NetworkType(Enum):
@@ -27,6 +27,8 @@ class NetworkData:
 
     """
     self.n = 0
+    self.mu = None
+    self.sigma = None
     self.network = None
     self.thresholds = []
 
@@ -66,6 +68,10 @@ class NetworkData:
     :param sigma:
     """
     self.thresholds = createThresholds(distributionType, self.n, mu, sigma)
+
+    if distributionType == Distribution.NORMAL.value:
+      self.mu = mu
+      self.sigma = sigma
 
 
 def constrained_sum_sample_pos(n, total):

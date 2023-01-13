@@ -16,11 +16,11 @@ def runGranovetterModel(n, i, mu, in_degree):
   """
 
   # Uniform distribution
-  singleRun(RunType.Granovetter, n, NetworkType.DIRECTED, False, False, Distribution.UNIFORM, 0.0, 0.0,
+  singleRun(RunType.Granovetter, n, NetworkType.DIRECTED, KnowledgeType.Network.value, False, Distribution.UNIFORM, None, None,
             in_degree, NetworkData(), ' using a uniform distribution', 'granovetter_uniform')
 
   # Manipulated uniform distribution
-  singleRun(RunType.Granovetter, n, NetworkType.DIRECTED, False, False, Distribution.UNIFORM_MODIFIED, 0.0, 0.0,
+  singleRun(RunType.Granovetter, n, NetworkType.DIRECTED, KnowledgeType.Network.value, False, Distribution.UNIFORM_MODIFIED, None, None,
             in_degree, NetworkData(), ' using a manipulated uniform distribution', 'granovetter_manipulated_uniform')
 
   # Varying sigmas test
