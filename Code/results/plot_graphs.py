@@ -226,6 +226,25 @@ def multipleVariablesPlot(path, data_1, data_2, varying_variable, comparison_var
   elif varying_variable == 'in_degree':
     ax.get_xaxis().set_ticks(range(0, 11, 1))
 
+  # y_min = max(plt.gca().get_lines()[0].get_ydata())
+  # y_max = 0
+  # for line in plt.gca().get_lines():
+  #   line_min = min(line.get_ydata())
+  #   if line_min <= y_min:
+  #     y_min = line_min
+  #
+  #   line_max = max(line.get_ydata())
+  #   if line_max >= y_max:
+  #     y_max = line_max
+  #
+  # print(y_min)
+  # print(y_max)
+  #
+  # if y_max - y_min >= 0.1:
+  #   plt.yticks(np.arange(y_min, y_max + 0.1, 0.2))
+  # else:
+  #   plt.yticks(np.arange(y_min-0.1, y_max + 0.005, 0.01))
+
   # plt.title('Median agent engagement for normal distributions with varying ' + getAxisLabel(varying_variable),
   #           size=title_size)
   plt.xlabel(getAxisLabel(varying_variable), size=axis_label_size)

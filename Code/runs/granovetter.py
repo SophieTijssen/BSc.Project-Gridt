@@ -29,7 +29,7 @@ def runGranovetterModel(n, i, mu, in_degree):
   results = batchRunGranovetter(n, i, NetworkType.Directed.value, Distribution.NORMAL.value, mu, sigmas, in_degree)
   results.to_csv(path_data + 'sigma.csv')
 
-  print(results.groupby(by=['sigma'])[['engagement_ratio']].mean())
-  print(results.groupby(by=['sigma'])[['engagement_ratio']].std())
+  # print(results.groupby(by=['sigma'])[['engagement_ratio']].mean())
+  # print(results.groupby(by=['sigma'])[['engagement_ratio']].std())
 
   sigmaPlot(path_figure, results)

@@ -6,7 +6,7 @@ from runs.run_types import *
 
 # Hyperparameters
 n = 100
-iterations = 5
+iterations = 1
 mu = 0.25
 sigma = 0.2
 in_degree = 3
