@@ -1,9 +1,9 @@
-import numpy as np
-
 from utilities.threshold_util import Distribution
-from utilities.network_util import NetworkType, NetworkData
 from runs.run_types import *
-from results.plot_graphs import sigmaPlot
+
+
+path_figure = 'results/figures/granovetter/'
+path_data = 'results/raw_data/granovetter/'
 
 
 def runGranovetterModel(n, i, mu, in_degree):
@@ -16,15 +16,20 @@ def runGranovetterModel(n, i, mu, in_degree):
   """
 
   # Uniform distribution
-  singleRun(RunType.Granovetter, n, NetworkType.DIRECTED, KnowledgeType.Network.value, False, Distribution.UNIFORM, None, None,
-            in_degree, NetworkData(), ' using a uniform distribution', 'granovetter_uniform')
+  singleRun(RunType.Granovetter.value, n, NetworkType.Directed.value, KnowledgeType.Network.value,
+            Distribution.UNIFORM.value, None, None, in_degree, NetworkData(), path_figure, 'granovetter_uniform')
 
   # Manipulated uniform distribution
-  singleRun(RunType.Granovetter, n, NetworkType.DIRECTED, KnowledgeType.Network.value, False, Distribution.UNIFORM_MODIFIED, None, None,
-            in_degree, NetworkData(), ' using a manipulated uniform distribution', 'granovetter_manipulated_uniform')
+  singleRun(RunType.Granovetter.value, n, NetworkType.Directed.value, KnowledgeType.Network.value,
+            Distribution.UNIFORM_MODIFIED.value, None, None, in_degree, NetworkData(), path_figure,
+            'granovetter_manipulated_uniform')
 
   # Varying sigmas test
-  sigmas = np.linspace(0.0, 1.0, 101).round(decimals=2)
-  results = batchRunGranovetter(n, i, NetworkType.DIRECTED, Distribution.NORMAL, mu, sigmas, in_degree)
+  sigmas = np.linspace(0.0, 2.0, 201).round(decimals=2)
+  results = batchRunGranovetter(n, i, NetworkType.Directed.value, Distribution.NORMAL.value, mu, sigmas, in_degree)
+  results.to_csv(path_data + 'sigma.csv')
 
-  sigmaPlot(results)
+  print(results.groupby(by=['sigma'])[['engagement_ratio']].mean())
+  print(results.groupby(by=['sigma'])[['engagement_ratio']].std())
+
+  sigmaPlot(path_figure, results)

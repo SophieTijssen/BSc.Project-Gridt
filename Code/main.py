@@ -1,10 +1,4 @@
-import numpy as np
-from scipy.stats import beta
-import matplotlib.pyplot as plt
-
-from runs.neighbourhood_comparison import runNeighbourhoodComparison
-from utilities.model_util import RunType
-from utilities.network_util import NetworkType
+from runs.knowledge_comparison import runKnowledgeComparison
 from utilities.threshold_util import Distribution
 from runs.granovetter import runGranovetterModel
 from runs.network_comparison import runNetworkComparison
@@ -12,19 +6,23 @@ from runs.run_types import *
 
 # Hyperparameters
 n = 100
-iterations = 10
+iterations = 5
 mu = 0.25
 sigma = 0.2
 in_degree = 3
 
+path_figure = 'results/figures/'
+
 # Run parameters
-run_type = RunType.NetworkComparison
-# run_types = [RunType.Granovetter, RunType.Neighbourhood, RunType.NetworkComparison]
-network_type = NetworkType.DIRECTED
-distribution = Distribution.NORMAL
+# run_types = [RunType.Granovetter]
+# run_types = [RunType.KnowledgeComparison]
+# run_types = [RunType.NetworkComparison]
+run_types = [RunType.Granovetter, RunType.KnowledgeComparison, RunType.NetworkComparison]
+network_type = NetworkType.Directed.value
+distribution = Distribution.NORMAL.value
 
 
-def main():
+def main(run_type):
   """
   The main function used to run the project.
   """
@@ -33,30 +31,19 @@ def main():
     # Replicate results found by Granovetter TODO: include citation.
     runGranovetterModel(n, iterations, mu, in_degree)
 
-  elif run_type == RunType.Neighbourhood:
-    runNeighbourhoodComparison(n, iterations, mu, sigma, in_degree)
+  elif run_type == RunType.KnowledgeComparison:
+    runKnowledgeComparison(n, iterations, mu, sigma, in_degree)
 
   elif run_type == RunType.NetworkComparison:
     # Compare a directed network to an undirected network.
     runNetworkComparison(n, iterations, mu, sigma, in_degree)
 
-    # sigmas = np.linspace(0.0, 1.0, 11).round(decimals=2)
-    #
-    # # 3
-    # results_undirected = batchRun(n, iterations, NetworkType.UNDIRECTED, True, Distribution.NORMAL, mu, sigmas, in_degree)
-    # sigmaBoxPlot(results_undirected)
-    #
-    # # 4
-    # results_directed = batchRun(n, iterations, NetworkType.DIRECTED, True, Distribution.NORMAL, mu, sigmas, in_degree)
-    # sigmaBoxPlot(results_directed)
-
   elif run_type == RunType.Single:
     # Single Run
-    neighbourhood = False
-    utility = False
+    knowledge = KnowledgeType.Network.value
 
-    singleRun(run_type, n, network_type, neighbourhood, utility, distribution, mu, sigma, in_degree,
-              NetworkData(), titleSpecification='Single run', filename='single_run')
+    singleRun(run_type, n, network_type, knowledge, distribution, mu, sigma, in_degree,
+              NetworkData(), path=path_figure, filename='single_run')
 
   else:
     # Batch Run
@@ -65,13 +52,16 @@ def main():
     # 1
     results_whole = batchRunNeighbourhood(run_type, n, iterations, network_type, False, False, distribution,
                                           mu, sigmas, in_degree)
-    sigmaBoxPlot(results_whole)
+    sigmaBoxPlot(path_figure, results_whole)
 
     # 2
     results_neighbours = batchRunNeighbourhood(run_type, n, iterations, network_type, True, False, distribution,
                                                mu, sigmas, in_degree)
-    sigmaBoxPlot(results_neighbours)
+    sigmaBoxPlot(path_figure, results_neighbours)
 
 
 if __name__ == '__main__':
-  main()
+  # main()
+
+  for run in run_types:
+    main(run)

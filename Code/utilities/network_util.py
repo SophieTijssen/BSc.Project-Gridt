@@ -9,8 +9,8 @@ class NetworkType(Enum):
   """
   Enumerate class for the different network types.
   """
-  UNDIRECTED = 0
-  DIRECTED = 1
+  Undirected = 0
+  Directed = 1
 
 
 class KnowledgeType(Enum):
@@ -46,18 +46,18 @@ class NetworkData:
 
     self.network = createDirectedNetwork(n, in_degree)
 
-    if networkType == NetworkType.UNDIRECTED:
+    if networkType == NetworkType.Undirected:
       self.convertNetwork()
 
     self.generateNewThresholds(distributionType, mu, sigma)
 
-    print("directed: ", self.network)
+    # print("directed: ", self.network)
 
   def convertNetwork(self):
     """
 
     """
-    print("Convert network is called")
+    # print("Convert network is called")
     self.network = convertToUndirectedNetwork(self.network)
 
   def generateNewThresholds(self, distributionType, mu, sigma):
@@ -103,6 +103,7 @@ def createDirectedNetwork(n, in_degree):
   out_degree_list = [in_degree] * n
   in_degree_list = constrained_sum_sample_pos(n, sum(out_degree_list))
 
+  # TODO: Remember that parallel edges are not possible in the network (only one edge between two nodes) -> can there be an edge from a ->b if there is an edge from b -> a?
   G = nx.directed_configuration_model(
     in_degree_sequence=in_degree_list,
     out_degree_sequence=out_degree_list,
@@ -123,6 +124,6 @@ def convertToUndirectedNetwork(G):
   """
 
   H = G.to_undirected()
-  print("undirected: ", H)
+  # print("undirected: ", H)
 
   return H

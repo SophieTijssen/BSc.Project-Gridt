@@ -60,10 +60,3 @@ class NeighbourhoodAgent(GranovetterAgent):
 
     if cooperating_rate >= self.cooperate_threshold:
       self.cooperating = True
-
-  # def advance(self):
-  #   """
-  #   Publish the actions of all agents simultaneously.
-  #   """
-  #   if self.cooperating and self.state == State.DEFECT:
-  #     self.state = State.COOPERATE

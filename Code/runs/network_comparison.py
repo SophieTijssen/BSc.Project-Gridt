@@ -1,7 +1,11 @@
-from results.plot_graphs import multipleRunPlot
 from runs.run_types import *
+from utilities.model_util import RunType
 from utilities.threshold_util import Distribution
 from utilities.network_util import NetworkType, NetworkData
+
+
+path_figure = 'results/figures/network_comparison/'
+path_data = 'results/raw_data/network_comparison/'
 
 
 def runNetworkComparison(n, i, mu, sigma, in_degree):
@@ -17,60 +21,76 @@ def runNetworkComparison(n, i, mu, sigma, in_degree):
 
   batch = True
 
-  # TODO: use the same network for directed as for undirected to get an accurate conversion
   if batch:
-    # Run simulations
-    results = batchRunNeighbourhood(RunType.NetworkComparison, n, i, [NetworkType.DIRECTED, NetworkType.UNDIRECTED], True, False, Distribution.NORMAL, mu, sigma, in_degree)
-    results.to_csv('results/raw_data/network_comparison.csv')
+    # Run standard comparison simulations
+    results = batchRunNeighbourhood(RunType.NetworkComparison.value, n, i,
+                                    [NetworkType.Directed.value, NetworkType.Undirected.value],
+                                    KnowledgeType.Neighbourhood.value, Distribution.NORMAL.value, mu, sigma, in_degree)
+    results.to_csv(path_data + 'network_comparison.csv')
 
-    # Plot multiple runs in one graph
-    results_undirected = results[results['networkType'] == NetworkType.UNDIRECTED.value]
-    results_undirected.to_csv('results/raw_data/results_undirected.csv')
-
-    results_directed = results[results['networkType'] == NetworkType.DIRECTED.value]
-    results_directed.to_csv('results/raw_data/results_directed.csv')
-
-    maxSteps = max(max(results_undirected['Step']), max(results_directed['Step'])) + 1
-    multipleRunPlot(results_undirected, maxSteps, 'in an undirected network', 'undirected_network')
-    multipleRunPlot(results_directed, maxSteps, 'in a directed network', 'directed_network')
+    # Box plots
+    boxplotComparison(path_figure, results, 'networkType', 'engagement_ratio')  # , 'Equilibrium number of agents')
+    boxplotComparison(path_figure, results, 'networkType', 'Step')  # , 'Diffusion of behaviour')
 
     # Plot single run in one graph
-    comparisonPlot(results, 'network_comparison', 'networkType')
+    comparisonPlot(path_figure, results, 'network_comparison', 'networkType')
 
     # Alternate sigmas
     sigmas = np.linspace(0.0, 1.0, 11).round(decimals=2)
-    results = batchRunNeighbourhood(RunType.NetworkComparison, n, i, [NetworkType.DIRECTED, NetworkType.UNDIRECTED],
-                                    KnowledgeType.Neighbourhood.value, False, Distribution.NORMAL, mu, sigmas,
-                                    in_degree, collectionPeriod=-1)
+    results_sigma = batchRunNeighbourhood(RunType.NetworkComparison.value, n, i,
+                                          [NetworkType.Directed.value, NetworkType.Undirected.value],
+                                          KnowledgeType.Neighbourhood.value, Distribution.NORMAL.value,
+                                          mu, sigmas, in_degree, collectionPeriod=-1)
 
-    results.to_csv('results/raw_data/network_sigma_comparison.csv')
+    results_sigma.to_csv(path_data + 'sigma_comparison.csv')
 
-    sigma_undirected = results[results['networkType'] == NetworkType.UNDIRECTED.value]
-    sigma_directed = results[results['networkType'] == NetworkType.DIRECTED.value]
+    sigma_undirected = results_sigma[results_sigma['networkType'] == NetworkType.Undirected.value]
+    sigma_directed = results_sigma[results_sigma['networkType'] == NetworkType.Directed.value]
 
-    multipleVariablesPlot(sigma_undirected, sigma_directed, 'sigma', ['Undirected', 'Directed'], 'sigma')
-    # TODO: Plot effect on diffusion rate
+    multipleVariablesPlot(path_figure, (NetworkType.Undirected.value, sigma_undirected),
+                          (NetworkType.Directed.value, sigma_directed),
+                          'sigma', 'networkType')
 
     # Alternating number of nodes
     nums = range(80, 140, 5)
-    results = batchRunNeighbourhood(RunType.NetworkComparison, nums, i, [NetworkType.DIRECTED, NetworkType.UNDIRECTED],
-                                    KnowledgeType.Neighbourhood.value, False, Distribution.NORMAL, mu, sigma, in_degree,
-                                    collectionPeriod=-1)
+    results_n = batchRunNeighbourhood(RunType.NetworkComparison.value, nums, i,
+                                      [NetworkType.Directed.value, NetworkType.Undirected.value],
+                                      KnowledgeType.Neighbourhood.value, Distribution.NORMAL.value,
+                                      mu, sigma, in_degree, collectionPeriod=-1)
 
-    results.to_csv('results/raw_data/network_n_comparison.csv')
+    results_n.to_csv(path_data + 'n_comparison.csv')
 
-    n_undirected = results[results['networkType'] == NetworkType.UNDIRECTED.value]
-    n_directed = results[results['networkType'] == NetworkType.DIRECTED.value]
+    n_undirected = results_n[results_n['networkType'] == NetworkType.Undirected.value]
+    n_directed = results_n[results_n['networkType'] == NetworkType.Directed.value]
 
-    multipleVariablesPlot(n_undirected, n_directed, 'num_of_nodes', ['Undirected', 'Directed'], 'n')
-    # TODO: Plot effect on diffusion rate
+    multipleVariablesPlot(path_figure, (NetworkType.Undirected.value, n_undirected),
+                          (NetworkType.Directed.value, n_directed),
+                          'num_of_nodes', 'networkType')
+
+    # Alternating in-degrees
+    in_degrees = range(1, 11, 1)
+    results_degree = batchRunNeighbourhood(RunType.NetworkComparison.value, n, i,
+                                           [NetworkType.Directed.value, NetworkType.Undirected.value],
+                                           KnowledgeType.Neighbourhood.value, Distribution.NORMAL.value,
+                                           mu, sigma, in_degrees, collectionPeriod=-1)
+
+    results_degree.to_csv(path_data + 'in-degree_comparison.csv')
+
+    degree_undirected = results_degree[results_degree['networkType'] == NetworkType.Undirected.value]
+    degree_directed = results_degree[results_degree['networkType'] == NetworkType.Directed.value]
+
+    multipleVariablesPlot(path_figure, (NetworkType.Undirected.value, degree_undirected),
+                          (NetworkType.Directed.value, degree_directed),
+                          'in_degree', 'networkType')
 
   else:
     networkData = NetworkData()
-    networkData.createNewNetwork(NetworkType.DIRECTED, n, in_degree, Distribution.NORMAL, mu, sigma)
+    networkData.createNewNetwork(NetworkType.Directed, n, in_degree, Distribution.NORMAL, mu, sigma)
 
-    singleRun(RunType.NetworkComparison, n, NetworkType.DIRECTED, True, False, Distribution.NORMAL, mu, sigma, in_degree, networkData, 'in a directed network')
+    singleRun(RunType.NetworkComparison.value, n, NetworkType.Directed.value, KnowledgeType.Neighbourhood.value,
+              Distribution.NORMAL.value, mu, sigma, in_degree, networkData, path_figure, 'directed_network')
 
     networkData.convertNetwork()
 
-    singleRun(RunType.NetworkComparison, n, NetworkType.UNDIRECTED, True, False, Distribution.NORMAL, mu, sigma, in_degree, networkData, 'in an undirected network')
+    singleRun(RunType.NetworkComparison.value, n, NetworkType.Undirected.value, KnowledgeType.Neighbourhood.value,
+              Distribution.NORMAL.value, mu, sigma, in_degree, networkData, path_figure, 'undirected_network')

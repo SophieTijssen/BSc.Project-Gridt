@@ -6,12 +6,11 @@ class RunType(Enum):
   Enumerate class for the possible runs types.
   """
   Granovetter = 0
-  NetworkComparison = 1
-  Single = 2
-  Batch = 3
-  Neighbourhood = 5
-  Utility = 6
-  SigmaComparison = 7
+  KnowledgeComparison = 1
+  NetworkComparison = 2
+  SigmaComparison = 3
+  Single = 4
+  Batch = 5
 
 
 class State(Enum):

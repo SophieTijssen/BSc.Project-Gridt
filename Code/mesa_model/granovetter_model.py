@@ -1,7 +1,6 @@
 from mesa import Model, DataCollector
 from mesa.time import SimultaneousActivation
 from mesa.space import NetworkGrid
-import numpy as np
 
 from mesa_model.granovetter_agent import *
 from utilities.model_util import *

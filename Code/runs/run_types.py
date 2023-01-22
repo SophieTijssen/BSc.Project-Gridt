@@ -6,28 +6,29 @@ from utilities.model_util import RunType
 from utilities.network_util import NetworkData
 
 
-def singleRun(run, n, network, neighbourhood, utility, distribution, mu, sigma, in_degree, networkData, titleSpecification, filename):
+def singleRun(run, n, network, knowledge, distribution, mu, sigma, in_degree, networkData, path, filename):
   """
   Run the model for a single iteration.
 
   :param run: The type of run which specifies which model/agent to use.
   :param n: The number of agents in the network.
   :param network: The type of network used for the model (directed/undirected).
-  :param neighbourhood: Boolean that shows whether an agent can see the whole network or only its neighbourhood.
+  :param knowledge: Boolean that shows whether an agent can see the whole network or only its neighbourhood.
   :param distribution: The distribution used for sampling the agent thresholds.
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
   :param sigma: The standard deviation of the threshold distribution (in case of a normal distribution).
   :param in_degree: The in-degree of all agents.
   :param networkData: An object to store the network that should be used (can be empty).
-  :param titleSpecification: Specification of the title to add at the end of the standard title.
+  :param path:
+  :param filename:
   """
 
-  if run == RunType.Granovetter:
-    model = GranovetterModel(num_of_nodes=n, networkType=network.value, distributionType=distribution.value,
+  if run == RunType.Granovetter.value:
+    model = GranovetterModel(num_of_nodes=n, networkType=network, distributionType=distribution,
                              mu=mu, sigma=sigma, in_degree=in_degree)
   else:
-    model = NeighbourhoodModel(run=run.value, num_of_nodes=n, neighbourhood=neighbourhood, utility=utility, networkType=network.value,
-                               distributionType=distribution.value, mu=mu, sigma=sigma, in_degree=in_degree,
+    model = NeighbourhoodModel(run=run, num_of_nodes=n, knowledge=knowledge, networkType=network,
+                               distributionType=distribution, mu=mu, sigma=sigma, in_degree=in_degree,
                                networkData=networkData)
 
   while model.running and model.schedule.steps < 100:
@@ -36,11 +37,11 @@ def singleRun(run, n, network, neighbourhood, utility, distribution, mu, sigma, 
   model.datacollector.collect(model)
   model_out = model.datacollector.get_model_vars_dataframe()
 
-  plotDirectedGraph(model, filename)
+  # plotDirectedGraph(model, filename)
 
-  showDegreeHistogram(model.G, filename)
+  showDegreeHistogram(path, model.G, filename)
 
-  singleRunPlot(model_out, titleSpecification, filename)
+  singleRunPlot(path, model_out, filename)
 
 
 def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
@@ -60,8 +61,8 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
 
   params = {
     "num_of_nodes": n,
-    "networkType": network.value,
-    "distributionType": distributions.value,
+    "networkType": network,
+    "distributionType": distributions,
     "mu": mu,
     "sigma": sigmas,
     "in_degree": in_degree,
@@ -77,45 +78,38 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
     display_progress=True
   )
 
-  results_df = pd.DataFrame(results)  # .drop('networkData', axis=1)
+  results_df = pd.DataFrame(results)
 
   return results_df
 
 
-def batchRunNeighbourhood(run, n, i, networks, neighbourhoods, utility, distribution, mu, sigmas, in_degree, collectionPeriod=1):
+def batchRunNeighbourhood(run, n, i, network, knowledge, distribution, mu, sigma, in_degree, collectionPeriod=1):
   """
   Run the model for multiple iterations (using BatchRun).
 
   :param run:
   :param n: The number of agents in the network.
   :param i: The number of iterations of the batch run.
-  :param networks: The type of network used for the model (directed/undirected).
-  :param neighbourhoods: Boolean that shows whether an agent can see the whole network or only its neighbourhood.
-  :param utility:
+  :param network: The type of network used for the model (directed/undirected).
+  :param knowledge: Boolean that shows whether an agent can see the whole network or only its neighbourhood.
   :param distribution: The distribution used for sampling the agent thresholds.
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
-  :param sigmas: A list containing the standard deviations of the threshold distributions
+  :param sigma: A list containing the standard deviations of the threshold distributions
                  for each iteration (in case of a normal distribution).
   :param in_degree: The in-degree of all agents.
   :param collectionPeriod:
   :return: A pandas dataframe containing the results/data from the DataCollector.
   """
 
-  if type(networks) == list:
-    network_values = [ntype.value for ntype in networks]
-  else:
-    network_values = networks.value
-
   params = {
-    "run": run.value,
+    "run": run,
     "num_of_nodes": n,
-    "sigma": sigmas,
-    "networkType": network_values,
-    "neighbourhood": neighbourhoods,
-    "utility": utility,
-    "distributionType": distribution.value,
-    "mu": mu,
     "in_degree": in_degree,
+    "mu": mu,
+    "sigma": sigma,
+    "networkType": network,
+    "knowledge": knowledge,
+    "distributionType": distribution,
     "networkData": NetworkData()
   }
 
