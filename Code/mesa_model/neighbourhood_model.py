@@ -1,3 +1,5 @@
+from mesa import DataCollector
+
 from mesa_model.granovetter_model import GranovetterModel
 from mesa_model.neighbourhood_agent import NeighbourhoodAgent
 from utilities.model_util import *
@@ -6,7 +8,7 @@ from utilities.network_util import *
 
 class NeighbourhoodModel(GranovetterModel):
 
-  def __init__(self, run, num_of_nodes, mu, sigma, in_degree, networkType, knowledge, distributionType, networkData):
+  def __init__(self, run, num_of_nodes, mu, sigma, out_degree, networkType, knowledge, distributionType, networkData):
     """
     Initialisation of the model.
 
@@ -17,7 +19,7 @@ class NeighbourhoodModel(GranovetterModel):
     :param distributionType: The type of distribution used to sample the agent thresholds.
     :param mu: The mean of the threshold distribution.
     :param sigma: The standard deviation of the threshold distribution.
-    :param in_degree: The in-degree of each node in the network.
+    :param out_degree: The out-degree of each node in the network.
     :param networkData: A class containing data about the network and agent thresholds.
     """
 
@@ -26,7 +28,15 @@ class NeighbourhoodModel(GranovetterModel):
     self.neighbourhood = knowledge
     self.networkData = networkData
 
-    super().__init__(num_of_nodes, networkType, distributionType, mu, sigma, in_degree)
+    super().__init__(num_of_nodes, networkType, distributionType, mu, sigma, out_degree)
+
+  def createDataCollector(self):
+    datacollector = DataCollector(
+      model_reporters={"engagement_ratio": calculate_engagement_ratio,
+                       "diffusion_rate": calculate_diffusion_rate},
+      # agent_reporters={"state": "state.value"}
+    )
+    return datacollector
 
   def generateNetwork(self):
     """
@@ -37,13 +47,13 @@ class NeighbourhoodModel(GranovetterModel):
     # We do not have a previously used network
     if self.networkData.network is None:
       # print("First network created")
-      self.networkData.createNewNetwork(self.networkType, self.num_of_nodes, self.in_degree, self.distributionType, self.mu, self.sigma)
+      self.networkData.createNewNetwork(self.networkType, self.num_of_nodes, self.out_degree, self.distributionType, self.mu, self.sigma)
 
     elif self.run == RunType.KnowledgeComparison.value:
       # We want to create a new network for each iteration (when neighbourhood is False)
       if not self.neighbourhood:
         # print(self.neighbourhood, ": New network created where whole network is visible to agents")
-        self.networkData.createNewNetwork(self.networkType, self.num_of_nodes, self.in_degree, self.distributionType, self.mu, self.sigma)
+        self.networkData.createNewNetwork(self.networkType, self.num_of_nodes, self.out_degree, self.distributionType, self.mu, self.sigma)
       # else:
         # print(self.neighbourhood, ": Using the existing network but only the neighbourhood is visible to agents")
 
@@ -51,7 +61,7 @@ class NeighbourhoodModel(GranovetterModel):
       # We want to create a new directed network
       if self.networkType == NetworkType.Directed.value:
         # print(self.networkType, ": Directed network created")
-        self.networkData.createNewNetwork(self.networkType, self.num_of_nodes, self.in_degree, self.distributionType, self.mu, self.sigma)
+        self.networkData.createNewNetwork(self.networkType, self.num_of_nodes, self.out_degree, self.distributionType, self.mu, self.sigma)
 
       # Convert previously used directed network to an undirected network
       else:
@@ -62,7 +72,7 @@ class NeighbourhoodModel(GranovetterModel):
       self.networkData.generateNewThresholds(self.distributionType, self.mu, self.sigma)
 
     else:
-      self.networkData.createNewNetwork(self.networkType, self.num_of_nodes, self.in_degree, self.distributionType, self.mu, self.sigma)
+      self.networkData.createNewNetwork(self.networkType, self.num_of_nodes, self.out_degree, self.distributionType, self.mu, self.sigma)
 
     G = self.networkData.network
 

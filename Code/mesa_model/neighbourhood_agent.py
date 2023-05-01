@@ -20,19 +20,19 @@ class NeighbourhoodAgent(GranovetterAgent):
 
     super().__init__(unique_id, model, initial_state, cooperate_threshold)
 
-  def getState(self):
-    """
-
-    :return:
-    """
-    return self.state
-
-  def getThreshold(self):
-    """
-
-    :return:
-    """
-    return self.cooperate_threshold
+  # def getState(self):
+  #   """
+  #
+  #   :return:
+  #   """
+  #   return self.state
+  #
+  # def getThreshold(self):
+  #   """
+  #
+  #   :return:
+  #   """
+  #   return self.cooperate_threshold
 
   def step(self):
     """

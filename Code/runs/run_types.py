@@ -6,7 +6,7 @@ from utilities.model_util import RunType
 from utilities.network_util import NetworkData
 
 
-def singleRun(run, n, network, knowledge, distribution, mu, sigma, in_degree, networkData, path, filename):
+def singleRun(run, n, network, knowledge, distribution, mu, sigma, out_degree, networkData, path, filename):
   """
   Run the model for a single iteration.
 
@@ -17,7 +17,7 @@ def singleRun(run, n, network, knowledge, distribution, mu, sigma, in_degree, ne
   :param distribution: The distribution used for sampling the agent thresholds.
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
   :param sigma: The standard deviation of the threshold distribution (in case of a normal distribution).
-  :param in_degree: The in-degree of all agents.
+  :param out_degree: The out-degree of all agents.
   :param networkData: An object to store the network that should be used (can be empty).
   :param path:
   :param filename:
@@ -25,10 +25,10 @@ def singleRun(run, n, network, knowledge, distribution, mu, sigma, in_degree, ne
 
   if run == RunType.Granovetter.value:
     model = GranovetterModel(num_of_nodes=n, networkType=network, distributionType=distribution,
-                             mu=mu, sigma=sigma, in_degree=in_degree)
+                             mu=mu, sigma=sigma, out_degree=out_degree)
   else:
     model = NeighbourhoodModel(run=run, num_of_nodes=n, knowledge=knowledge, networkType=network,
-                               distributionType=distribution, mu=mu, sigma=sigma, in_degree=in_degree,
+                               distributionType=distribution, mu=mu, sigma=sigma, out_degree=out_degree,
                                networkData=networkData)
 
   while model.running and model.schedule.steps < 100:
@@ -44,7 +44,7 @@ def singleRun(run, n, network, knowledge, distribution, mu, sigma, in_degree, ne
   singleRunPlot(path, model_out, filename)
 
 
-def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
+def batchRunGranovetter(n, i, network, distributions, mu, sigmas, out_degree):
   """
   Run the model for multiple iterations (using BatchRun).
 
@@ -55,7 +55,7 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
   :param sigmas: A list containing the standard deviations of the threshold distributions
                  for each iteration (in case of a normal distribution).
-  :param in_degree: The in-degree of all agents.
+  :param out_degree: The out-degree of all agents.
   :return: A pandas dataframe containing the results/data from the DataCollector.
   """
 
@@ -65,7 +65,7 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
     "distributionType": distributions,
     "mu": mu,
     "sigma": sigmas,
-    "in_degree": in_degree,
+    "out_degree": out_degree,
   }
 
   results = batch_run(
@@ -83,7 +83,7 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, in_degree):
   return results_df
 
 
-def batchRunNeighbourhood(run, n, i, network, knowledge, distribution, mu, sigma, in_degree, collectionPeriod=1):
+def batchRunNeighbourhood(run, n, i, network, knowledge, distribution, mu, sigma, out_degree, collectionPeriod=1):
   """
   Run the model for multiple iterations (using BatchRun).
 
@@ -96,7 +96,7 @@ def batchRunNeighbourhood(run, n, i, network, knowledge, distribution, mu, sigma
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
   :param sigma: A list containing the standard deviations of the threshold distributions
                  for each iteration (in case of a normal distribution).
-  :param in_degree: The in-degree of all agents.
+  :param out_degree: The out-degree of all agents.
   :param collectionPeriod:
   :return: A pandas dataframe containing the results/data from the DataCollector.
   """
@@ -104,7 +104,7 @@ def batchRunNeighbourhood(run, n, i, network, knowledge, distribution, mu, sigma
   params = {
     "run": run,
     "num_of_nodes": n,
-    "in_degree": in_degree,
+    "out_degree": out_degree,
     "mu": mu,
     "sigma": sigma,
     "networkType": network,

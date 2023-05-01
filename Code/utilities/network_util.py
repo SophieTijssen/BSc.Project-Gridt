@@ -32,19 +32,19 @@ class NetworkData:
     self.network = None
     self.thresholds = []
 
-  def createNewNetwork(self, networkType, n, in_degree, distributionType, mu, sigma):
+  def createNewNetwork(self, networkType, n, out_degree, distributionType, mu, sigma):
     """
 
     :param networkType:
     :param n:
-    :param in_degree:
+    :param out_degree:
     :param distributionType:
     :param mu:
     :param sigma:
     """
     self.n = n
 
-    self.network = createDirectedNetwork(n, in_degree)
+    self.network = createDirectedNetwork(n, out_degree)
 
     if networkType == NetworkType.Undirected:
       self.convertNetwork()
@@ -89,21 +89,21 @@ def constrained_sum_sample_pos(n, total):
   return [a - b for a, b in zip(dividers + [total], [0] + dividers)]
 
 
-def createDirectedNetwork(n, in_degree):
+def createDirectedNetwork(n, out_degree):
   """
   Function for creating a directed network.
 
   :param n: Number of nodes in the network.
-  :param in_degree: The in-degree of a node in the network.
+  :param out_degree: The number of neighbours of a node in the network.
   :return: A networkx DiGraph.
   """
   # in_degree_list = [in_degree] * n
   # out_degree_list = constrained_sum_sample_pos(n, sum(in_degree_list))
 
-  out_degree_list = [in_degree] * n
+  out_degree_list = [out_degree] * n
   in_degree_list = constrained_sum_sample_pos(n, sum(out_degree_list))
 
-  # TODO: Remember that parallel edges are not possible in the network (only one edge between two nodes) -> can there be an edge from a ->b if there is an edge from b -> a?
+  # TODO: Remember that parallel edges are not possible in the network (only one edge between two nodes) -> can there be an edge from a -> b if there is an edge from b -> a?
   G = nx.directed_configuration_model(
     in_degree_sequence=in_degree_list,
     out_degree_sequence=out_degree_list,

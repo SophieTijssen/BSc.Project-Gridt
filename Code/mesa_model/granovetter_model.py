@@ -10,7 +10,7 @@ from utilities.threshold_util import createThresholds
 
 class GranovetterModel(Model):
 
-  def __init__(self, num_of_nodes, networkType, distributionType, mu, sigma, in_degree):
+  def __init__(self, num_of_nodes, networkType, distributionType, mu, sigma, out_degree):
     """
     Initialisation of the model.
 
@@ -19,7 +19,7 @@ class GranovetterModel(Model):
     :param distributionType: The type of distribution used to sample the agent thresholds.
     :param mu: The mean of the threshold distribution.
     :param sigma: The standard deviation of the threshold distribution.
-    :param in_degree: The in-degree of each node in the network.
+    :param out_degree: The out-degree of each node in the network.
     """
     super().__init__()
 
@@ -33,7 +33,7 @@ class GranovetterModel(Model):
     self.distributionType = distributionType
     self.mu = mu
     self.sigma = sigma
-    self.in_degree = in_degree
+    self.out_degree = out_degree
     self.networkType = networkType
 
     self.G, self.thresholds = self.generateNetwork()
@@ -41,14 +41,18 @@ class GranovetterModel(Model):
 
     self.generateAgents()
 
-    self.datacollector = DataCollector(
-      model_reporters={"engagement_ratio": get_engagement_ratio},
+    self.datacollector = self.createDataCollector()
+
+  def createDataCollector(self):
+    datacollector = DataCollector(
+      model_reporters={"engagement_ratio": calculate_engagement_ratio},
       agent_reporters={"state": "state.value"}
     )
+    return datacollector
 
   def generateNetwork(self):
     # Create network (and grid) with set in-degree and random out-degree.
-    G = createDirectedNetwork(self.num_of_nodes, self.in_degree)
+    G = createDirectedNetwork(self.num_of_nodes, self.out_degree)
 
     if self.networkType == 0:  # Use an undirected network
       G = convertToUndirectedNetwork(G)

@@ -8,7 +8,7 @@ path_figure = 'results/figures/knowledge_comparison/'
 path_data = 'results/raw_data/knowledge_comparison/'
 
 
-def runKnowledgeComparison(n, i, mu, sigma, in_degree):
+def runKnowledgeComparison(n, i, mu, sigma, out_degree):
   """
   Run function for comparing a granovetter model and neighbourhood model on a directed network.
 
@@ -16,7 +16,7 @@ def runKnowledgeComparison(n, i, mu, sigma, in_degree):
   :param i: The number of iterations.
   :param mu: The mean of the threshold distribution.
   :param sigma: The standard deviation of the threshold distribution.
-  :param in_degree: The in-degree of each node in the network.
+  :param out_degree: The out-degree of each node in the network.
   """
 
   batch = True
@@ -25,7 +25,7 @@ def runKnowledgeComparison(n, i, mu, sigma, in_degree):
     # Run standard comparison simulations
     results = batchRunNeighbourhood(RunType.KnowledgeComparison.value, n, i, NetworkType.Directed.value,
                                     [KnowledgeType.Network.value, KnowledgeType.Neighbourhood.value],
-                                    Distribution.NORMAL.value, mu, sigma, in_degree)
+                                    DistributionType.NORMAL.value, mu, sigma, out_degree, collectionPeriod=-1)
     results.to_csv(path_data + 'knowledge_comparison.csv')
 
     # Box plots
@@ -36,10 +36,9 @@ def runKnowledgeComparison(n, i, mu, sigma, in_degree):
     comparisonPlot(path_figure, results, 'knowledge_comparison', 'knowledge')
 
     # Alternate sigmas
-    sigmas = np.linspace(0.0, 1.0, 11).round(decimals=2)
     results_sigma = batchRunNeighbourhood(RunType.KnowledgeComparison.value, n, i, NetworkType.Directed.value,
                                           [KnowledgeType.Network.value, KnowledgeType.Neighbourhood.value],
-                                          Distribution.NORMAL.value, mu, sigmas, in_degree, collectionPeriod=-1)
+                                          DistributionType.NORMAL.value, mu, sigmas, out_degree, collectionPeriod=-1)
 
     results_sigma.to_csv(path_data + 'sigma_comparison.csv')
 
@@ -51,10 +50,9 @@ def runKnowledgeComparison(n, i, mu, sigma, in_degree):
                           'sigma', 'knowledge')
 
     # Alternating number of nodes
-    nums = range(80, 140, 5)
     results_n = batchRunNeighbourhood(RunType.KnowledgeComparison.value, nums, i, NetworkType.Directed.value,
                                       [KnowledgeType.Network.value, KnowledgeType.Neighbourhood.value],
-                                      Distribution.NORMAL.value, mu, sigma, in_degree, collectionPeriod=-1)
+                                      DistributionType.NORMAL.value, mu, sigma, out_degree, collectionPeriod=-1)
 
     results_n.to_csv(path_data + 'n_comparison.csv')
 
@@ -65,13 +63,14 @@ def runKnowledgeComparison(n, i, mu, sigma, in_degree):
                           (KnowledgeType.Neighbourhood.value, n_neighbourhood),
                           'num_of_nodes', 'knowledge')
 
-    # Alternating in-degrees
-    in_degrees = range(1, 11, 1)
+      print('finished', 'knowledge', 'num_of_nodes', dependent_variable)
+
+    # Alternating out-degrees
     results_degree = batchRunNeighbourhood(RunType.KnowledgeComparison.value, n, i, NetworkType.Directed.value,
                                            [KnowledgeType.Network.value, KnowledgeType.Neighbourhood.value],
-                                           Distribution.NORMAL.value, mu, sigma, in_degrees, collectionPeriod=-1)
+                                           DistributionType.NORMAL.value, mu, sigma, out_degrees, collectionPeriod=-1)
 
-    results_degree.to_csv(path_data + 'in-degree_comparison.csv')
+    results_degree.to_csv(path_data + 'out-degree_comparison.csv')
 
     degree_network = results_degree[results_degree['knowledge'] == KnowledgeType.Network.value]
     degree_neighbourhood = results_degree[results_degree['knowledge'] == KnowledgeType.Neighbourhood.value]
@@ -82,10 +81,10 @@ def runKnowledgeComparison(n, i, mu, sigma, in_degree):
 
   else:
     networkData = NetworkData()
-    networkData.createNewNetwork(NetworkType.Directed, n, in_degree, Distribution.NORMAL, mu, sigma)
+    networkData.createNewNetwork(NetworkType.Directed, n, out_degree, DistributionType.NORMAL, mu, sigma)
 
     singleRun(RunType.KnowledgeComparison.value, n, NetworkType.Directed.value, KnowledgeType.Network.value,
-              Distribution.NORMAL.value, mu, sigma, in_degree, networkData, path_figure, 'whole_network')
+              DistributionType.NORMAL.value, mu, sigma, out_degree, networkData, path_figure, 'whole_network')
 
     singleRun(RunType.KnowledgeComparison.value, n, NetworkType.Directed.value, KnowledgeType.Neighbourhood.value,
-              Distribution.NORMAL.value, mu, sigma, in_degree, networkData, path_figure, 'neighbourhood')
+              DistributionType.NORMAL.value, mu, sigma, out_degree, networkData, path_figure, 'neighbourhood')

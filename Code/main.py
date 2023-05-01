@@ -9,7 +9,7 @@ n = 100
 iterations = 1
 mu = 0.25
 sigma = 0.2
-in_degree = 3
+out_degree = 3
 
 path_figure = 'results/figures/'
 
@@ -29,20 +29,21 @@ def main(run_type):
 
   if run_type == RunType.Granovetter:
     # Replicate results found by Granovetter TODO: include citation.
-    runGranovetterModel(n, iterations, mu, in_degree)
+    runGranovetterModel(n, iterations, mu, out_degree)
 
   elif run_type == RunType.KnowledgeComparison:
-    runKnowledgeComparison(n, iterations, mu, sigma, in_degree)
+    # Compare network knowledge to neighbourhood knowledge.
+    runKnowledgeComparison(n, iterations, mu, sigma, out_degree)
 
   elif run_type == RunType.NetworkComparison:
     # Compare a directed network to an undirected network.
-    runNetworkComparison(n, iterations, mu, sigma, in_degree)
+    runNetworkComparison(n, iterations, mu, sigma, out_degree)
 
   elif run_type == RunType.Single:
     # Single Run
     knowledge = KnowledgeType.Network.value
 
-    singleRun(run_type, n, network_type, knowledge, distribution, mu, sigma, in_degree,
+    singleRun(run_type, n, network_type, knowledge, distribution, mu, sigma, out_degree,
               NetworkData(), path=path_figure, filename='single_run')
 
   else:
@@ -51,12 +52,12 @@ def main(run_type):
 
     # 1
     results_whole = batchRunNeighbourhood(run_type, n, iterations, network_type, False, False, distribution,
-                                          mu, sigmas, in_degree)
+                                          mu, sigmas, out_degree)
     sigmaBoxPlot(path_figure, results_whole)
 
     # 2
     results_neighbours = batchRunNeighbourhood(run_type, n, iterations, network_type, True, False, distribution,
-                                               mu, sigmas, in_degree)
+                                               mu, sigmas, out_degree)
     sigmaBoxPlot(path_figure, results_neighbours)
 
 

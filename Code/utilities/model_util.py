@@ -1,4 +1,10 @@
 from enum import Enum
+import numpy as np
+
+
+sigmas = np.delete(np.linspace(0.0, 1.0, 11).round(decimals=2), 0)
+nums = range(10, 205, 5)
+out_degrees = range(1, 11, 1)
 
 
 class RunType(Enum):

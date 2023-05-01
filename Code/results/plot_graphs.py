@@ -188,7 +188,7 @@ def generateFigures():
     paths = [(path_knowledge, 'knowledge'), (path_network, 'networkType')]
     for path, comparison_variable in paths:
 
-      for csv_file, independent_variable in [('out-degree_comparison.csv', 'in_degree'), ('n_comparison.csv', 'num_of_nodes'), ('sigma_comparison.csv', 'sigma')]:
+      for csv_file, independent_variable in [('out-degree_comparison.csv', 'out_degree'), ('n_comparison.csv', 'num_of_nodes'), ('sigma_comparison.csv', 'sigma')]:
         results = pd.read_csv(path + csv_file)
 
         for dependent_variable in ['engagement_ratio', 'Step']:
@@ -210,7 +210,7 @@ def generateFigures():
       # results_n = pd.read_csv(path + 'n_comparison.csv')
       # results_sigma = pd.read_csv(path + 'sigma_comparison.csv')
 
-      # for csv_file, independent_variable in [('out-degree_comparison.csv', 'in_degree'), ('n_comparison.csv', 'num_of_nodes'), ('sigma_comparison.csv', 'sigma')]:
+      # for csv_file, independent_variable in [('out-degree_comparison.csv', 'out_degree'), ('n_comparison.csv', 'num_of_nodes'), ('sigma_comparison.csv', 'sigma')]:
       for csv_file, independent_variable in [('n_comparison.csv', 'num_of_nodes')]:
         results = pd.read_csv(path + csv_file)
 
