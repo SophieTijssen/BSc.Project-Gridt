@@ -1,6 +1,6 @@
 from runs.run_types import *
-from utilities.model_util import RunType
-from utilities.threshold_util import Distribution
+from utilities.model_util import RunType, sigmas, nums, out_degrees
+from utilities.threshold_util import DistributionType
 from utilities.network_util import NetworkType, NetworkData
 
 
