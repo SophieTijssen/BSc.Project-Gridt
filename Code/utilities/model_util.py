@@ -75,7 +75,7 @@ def number_defecting(model):
   return number_state(model, State.DEFECT)
 
 
-def get_engagement_ratio(model):
+def calculate_engagement_ratio(model):
   """
   Calculate the engagement ratio (the ratio of cooperating agents over all agents).
   :param model: The mesa model.
@@ -86,3 +86,23 @@ def get_engagement_ratio(model):
   total_agents = len(model.grid.get_all_cell_contents())
   cooperating_rate = cooperating/total_agents
   return cooperating_rate
+
+
+def calculate_diffusion_rate(model):
+  """
+  Calculate the diffusion rate (how fast a new behaviour spreads through a network).
+  Unit = agents/step or nodes/s
+  :param model: The mesa model.
+  :return The engagement ratio.
+  """
+
+  cooperating = number_cooperating(model)
+  steps = model.schedule.steps
+  if steps != 0:
+    diffusion_rate = cooperating/steps
+  else:
+    if steps == 0 and cooperating != 0:
+      print('huhh')
+      print(cooperating)
+    diffusion_rate = 0
+  return diffusion_rate

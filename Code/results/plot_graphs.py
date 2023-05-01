@@ -30,6 +30,7 @@ marker2 = 's'
 
 steps_axis = 'Number of steps'
 engagement_axis = 'Equilibrium of adopting agents'
+diffusion_axis = 'Diffusion rate (nodes/step)'
 sigma_axis = 'Standard deviation of decision threshold distribution'
 n_axis = 'Number of total agents'
 out_degree_axis = 'Out-degree'
@@ -41,6 +42,9 @@ def getAxisLabel(variable):
 
   elif variable == 'engagement_ratio':
     return engagement_axis
+
+  elif variable == 'diffusion_rate':
+    return diffusion_axis
 
   elif variable == 'sigma':
     return sigma_axis
@@ -477,7 +481,7 @@ def mean_sdSubplot(ax, data, independent_variable, dependent_variable, compariso
   else:
     label_specification = labelConversion(comparison_variable, comparison_value)
 
-  ax.plot(results[independent_variable], results[dependent_variable], markersize=10, c=colour_light, marker=marker, alpha=0.3, linewidth=2, edgecolors='face', label=label_specification)
+  ax.plot(results[independent_variable], results[dependent_variable], markersize=10, c=colour_light, marker=marker, alpha=0.3, linewidth=2, label=label_specification)  # , edgecolors='face', label=label_specification)
   # jitter(x=results[independent_variable], y=results[dependent_variable], position=position, s=50, c=colour_light, marker=marker, alpha=0.3, linewidths=2, edgecolors='face', label=label_specification)
 
   ax.plot(x, y, linestyle=line, linewidth=3, marker=marker,  markersize=15, alpha=1.0, color=colour_dark, label='Mean ' + label_specification)
