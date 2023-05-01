@@ -23,7 +23,7 @@ def createThresholds(distributionType, n, mu, sigma):
   :return: Numpy array of agent thresholds.
   """
 
-  if distributionType == Distribution.NORMAL.value:  # We use a normal distribution.
+  if distributionType == DistributionType.NORMAL.value:  # We use a normal distribution.
     thresholds = np.random.normal(mu, sigma, n)
 
     thresholds[thresholds > 1.0] = 1.0
@@ -32,7 +32,7 @@ def createThresholds(distributionType, n, mu, sigma):
   else:  # We use a (modified) uniform distribution.
     thresholds = np.arange(0.0, 1.0, (1.0 / n))
 
-    if distributionType == Distribution.UNIFORM_MODIFIED.value:
+    if distributionType == DistributionType.UNIFORM_MODIFIED.value:
       thresholds[thresholds == 0.01] = 0.02
 
   return thresholds

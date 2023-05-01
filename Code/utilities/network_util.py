@@ -2,7 +2,7 @@ import networkx as nx
 from enum import Enum
 from random import sample
 
-from utilities.threshold_util import createThresholds, Distribution
+from utilities.threshold_util import createThresholds, DistributionType
 
 
 class NetworkType(Enum):
@@ -76,7 +76,7 @@ class NetworkData:
     """
     self.thresholds = createThresholds(distributionType, self.n, mu, sigma)
 
-    if distributionType == Distribution.NORMAL.value:
+    if distributionType == DistributionType.NORMAL.value:
       self.mu = mu
       self.sigma = sigma
 

@@ -290,7 +290,7 @@ def statistical_tests():
   sigma_info = ('sigma_comparison.csv', 'sigma', list(sigmas))
   num_of_nodes_info = ('n_comparison.csv', 'num_of_nodes', nums)
   out_degree_info = ('out-degree_comparison.csv', 'out_degree', out_degrees)
-  
+
   for (file, independent_variable, values) in [sigma_info]:  # , num_of_nodes_info, out_degree_info]:
     # statistics_df = createDataFrame(independent_variable, values)
     # analysed_statistics_df = createDataFrame(independent_variable, values)
