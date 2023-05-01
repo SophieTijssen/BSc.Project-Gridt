@@ -48,7 +48,7 @@ def getAxisLabel(variable):
   elif variable == 'num_of_nodes':
     return n_axis
 
-  elif variable == 'in_degree':
+  elif variable == 'out_degree':
     return out_degree_axis
 
   else:
@@ -111,7 +111,7 @@ def prepareData(df, comparison_variable, comparison_values, independent_variable
 
 
 # def createMultipleBoxplots():
-def createMultipleBoxplots(results, comparison_variable, independent_variable, dependent_variable, i):
+def createMultipleBoxplots(results, comparison_variable, independent_variable, dependent_variable, filename):
   # # Some fake data to plot
   # data_0 = [[1, 2, 5], [5, 7, 2, 2, 5], [7, 2, 5]]
   # data_1 = [[6, 4, 2], [1, 2, 5, 3, 2], [2, 3, 5, 1]]
@@ -170,7 +170,7 @@ def createMultipleBoxplots(results, comparison_variable, independent_variable, d
   # plt.ylim(0, 1)
 
   plt.gcf().set_size_inches(15, 10)
-  plt.savefig('boxcompare' + str(i) + '.png', pad_inches=0.1, dpi=300)
+  plt.savefig('results/figures/boxplots/' + filename + '.png', pad_inches=0.1, dpi=300)
   plt.close()
 
 
@@ -182,7 +182,7 @@ def generateFigures():
   # results_network = pd.read_csv(path_network + 'network_comparison.csv')
 
   plot = 'multipleBoxplot'
-  i = 1
+  # i = 1
 
   if plot == 'multipleBoxplot':
     paths = [(path_knowledge, 'knowledge'), (path_network, 'networkType')]
@@ -193,10 +193,10 @@ def generateFigures():
 
         for dependent_variable in ['engagement_ratio', 'Step']:
 
-          createMultipleBoxplots(results, comparison_variable, independent_variable, dependent_variable, i)
+          createMultipleBoxplots(results, comparison_variable, independent_variable, dependent_variable, filename=comparison_variable + '_' + independent_variable + '_' + dependent_variable)
 
           print('finished', comparison_variable, independent_variable, dependent_variable)
-          i += 1
+          # i += 1
 
   elif plot == 'multipleVariablesPlot':
 

@@ -32,8 +32,11 @@ def runKnowledgeComparison(n, i, mu, sigma, out_degree):
     boxplotComparison(path_figure, results, 'knowledge', 'engagement_ratio')  # , 'Equilibrium number of agents')
     boxplotComparison(path_figure, results, 'knowledge', 'Step')  # , 'Diffusion of behaviour')
 
-    # Plot single run in one graph
-    comparisonPlot(path_figure, results, 'knowledge_comparison', 'knowledge')
+    # # Plot single run in one graph
+    # comparisonPlot(path_figure, results, 'knowledge_comparison', 'knowledge')
+
+    # Normal vs Beta distribution
+
 
     # Alternate sigmas
     results_sigma = batchRunNeighbourhood(RunType.KnowledgeComparison.value, n, i, NetworkType.Directed.value,
@@ -42,12 +45,18 @@ def runKnowledgeComparison(n, i, mu, sigma, out_degree):
 
     results_sigma.to_csv(path_data + 'sigma_comparison.csv')
 
-    sigma_network = results_sigma[results_sigma['knowledge'] == KnowledgeType.Network.value]
-    sigma_neighbourhood = results_sigma[results_sigma['knowledge'] == KnowledgeType.Neighbourhood.value]
+    # sigma_network = results_sigma[results_sigma['knowledge'] == KnowledgeType.Network.value]
+    # sigma_neighbourhood = results_sigma[results_sigma['knowledge'] == KnowledgeType.Neighbourhood.value]
 
-    multipleVariablesPlot(path_figure, (KnowledgeType.Network.value, sigma_network),
-                          (KnowledgeType.Neighbourhood.value, sigma_neighbourhood),
-                          'sigma', 'knowledge')
+    # multipleVariablesPlot(path_figure, (KnowledgeType.Network.value, sigma_network),
+    #                       (KnowledgeType.Neighbourhood.value, sigma_neighbourhood),
+    #                       'sigma', 'knowledge')
+
+    for dependent_variable in ['engagement_ratio', 'diffusion_rate']:
+      createMultipleBoxplots(results_sigma, 'knowledge', 'sigma', dependent_variable,
+                             filename='knowledge' + '_' + 'sigma' + '_' + dependent_variable)
+
+      print('finished', 'knowledge', 'sigma', dependent_variable)
 
     # Alternating number of nodes
     results_n = batchRunNeighbourhood(RunType.KnowledgeComparison.value, nums, i, NetworkType.Directed.value,
@@ -56,12 +65,16 @@ def runKnowledgeComparison(n, i, mu, sigma, out_degree):
 
     results_n.to_csv(path_data + 'n_comparison.csv')
 
-    n_network = results_n[results_n['knowledge'] == KnowledgeType.Network.value]
-    n_neighbourhood = results_n[results_n['knowledge'] == KnowledgeType.Neighbourhood.value]
+    # n_network = results_n[results_n['knowledge'] == KnowledgeType.Network.value]
+    # n_neighbourhood = results_n[results_n['knowledge'] == KnowledgeType.Neighbourhood.value]
+    #
+    # multipleVariablesPlot(path_figure, (KnowledgeType.Network.value, n_network),
+    #                       (KnowledgeType.Neighbourhood.value, n_neighbourhood),
+    #                       'num_of_nodes', 'knowledge')
 
-    multipleVariablesPlot(path_figure, (KnowledgeType.Network.value, n_network),
-                          (KnowledgeType.Neighbourhood.value, n_neighbourhood),
-                          'num_of_nodes', 'knowledge')
+    for dependent_variable in ['engagement_ratio', 'diffusion_rate']:
+      createMultipleBoxplots(results_n, 'knowledge', 'num_of_nodes', dependent_variable,
+                             filename='knowledge' + '_' + 'num_of_nodes' + '_' + dependent_variable)
 
       print('finished', 'knowledge', 'num_of_nodes', dependent_variable)
 
@@ -72,12 +85,18 @@ def runKnowledgeComparison(n, i, mu, sigma, out_degree):
 
     results_degree.to_csv(path_data + 'out-degree_comparison.csv')
 
-    degree_network = results_degree[results_degree['knowledge'] == KnowledgeType.Network.value]
-    degree_neighbourhood = results_degree[results_degree['knowledge'] == KnowledgeType.Neighbourhood.value]
+    # degree_network = results_degree[results_degree['knowledge'] == KnowledgeType.Network.value]
+    # degree_neighbourhood = results_degree[results_degree['knowledge'] == KnowledgeType.Neighbourhood.value]
+    #
+    # multipleVariablesPlot(path_figure, (KnowledgeType.Network.value, degree_network),
+    #                       (KnowledgeType.Neighbourhood.value, degree_neighbourhood),
+    #                       'out_degree', 'knowledge')
 
-    multipleVariablesPlot(path_figure, (KnowledgeType.Network.value, degree_network),
-                          (KnowledgeType.Neighbourhood.value, degree_neighbourhood),
-                          'in_degree', 'knowledge')
+    for dependent_variable in ['engagement_ratio', 'diffusion_rate']:
+      createMultipleBoxplots(results_degree, 'knowledge', 'out_degree', dependent_variable,
+                             filename='knowledge' + '_' + 'out_degree' + '_' + dependent_variable)
+
+      print('finished', 'knowledge', 'out_degree', dependent_variable)
 
   else:
     networkData = NetworkData()

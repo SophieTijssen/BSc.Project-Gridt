@@ -27,6 +27,23 @@ class State(Enum):
   COOPERATE = 1
 
 
+def getVariableName(variable):
+  if variable == 'knowledge':
+    return 'Knowledge type'
+  elif variable == 'networkType':
+    return 'Network type'
+  elif variable == 'sigma':
+    return 'Standard deviation of threshold distribution'
+  elif variable == 'num_of_nodes':
+    return 'Number of agents'
+  elif variable == 'out_degree':
+    return 'Out-degree'
+  elif variable == 'engagement_ratio':
+    return 'Equilibrium'
+  elif variable == 'Step':
+    return 'Diffusion'
+
+
 def number_state(model, state):
   """
   Count the total number of agents in a specific state in the network.

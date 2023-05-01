@@ -33,8 +33,8 @@ def runNetworkComparison(n, i, mu, sigma, out_degree):
     boxplotComparison(path_figure, results, 'networkType', 'engagement_ratio')  # , 'Equilibrium number of agents')
     boxplotComparison(path_figure, results, 'networkType', 'Step')  # , 'Diffusion of behaviour')
 
-    # Plot single run in one graph
-    comparisonPlot(path_figure, results, 'network_comparison', 'networkType')
+    # # Plot single run in one graph
+    # comparisonPlot(path_figure, results, 'network_comparison', 'networkType')
 
     # Alternate sigmas
     results_sigma = batchRunNeighbourhood(RunType.NetworkComparison.value, n, i,
@@ -44,12 +44,18 @@ def runNetworkComparison(n, i, mu, sigma, out_degree):
 
     results_sigma.to_csv(path_data + 'sigma_comparison.csv')
 
-    sigma_undirected = results_sigma[results_sigma['networkType'] == NetworkType.Undirected.value]
-    sigma_directed = results_sigma[results_sigma['networkType'] == NetworkType.Directed.value]
+    # sigma_undirected = results_sigma[results_sigma['networkType'] == NetworkType.Undirected.value]
+    # sigma_directed = results_sigma[results_sigma['networkType'] == NetworkType.Directed.value]
+    #
+    # multipleVariablesPlot(path_figure, (NetworkType.Undirected.value, sigma_undirected),
+    #                       (NetworkType.Directed.value, sigma_directed),
+    #                       'sigma', 'networkType')
 
-    multipleVariablesPlot(path_figure, (NetworkType.Undirected.value, sigma_undirected),
-                          (NetworkType.Directed.value, sigma_directed),
-                          'sigma', 'networkType')
+    for dependent_variable in ['engagement_ratio', 'diffusion_rate']:
+      createMultipleBoxplots(results_sigma, 'networkType', 'sigma', dependent_variable,
+                             filename='networkType' + '_' + 'sigma' + '_' + dependent_variable)
+
+      print('finished', 'networkType', 'sigma', dependent_variable)
 
     # Alternating number of nodes
     results_n = batchRunNeighbourhood(RunType.NetworkComparison.value, nums, i,
@@ -59,12 +65,16 @@ def runNetworkComparison(n, i, mu, sigma, out_degree):
 
     results_n.to_csv(path_data + 'n_comparison.csv')
 
-    n_undirected = results_n[results_n['networkType'] == NetworkType.Undirected.value]
-    n_directed = results_n[results_n['networkType'] == NetworkType.Directed.value]
+    # n_undirected = results_n[results_n['networkType'] == NetworkType.Undirected.value]
+    # n_directed = results_n[results_n['networkType'] == NetworkType.Directed.value]
+    #
+    # multipleVariablesPlot(path_figure, (NetworkType.Undirected.value, n_undirected),
+    #                       (NetworkType.Directed.value, n_directed),
+    #                       'num_of_nodes', 'networkType')
 
-    multipleVariablesPlot(path_figure, (NetworkType.Undirected.value, n_undirected),
-                          (NetworkType.Directed.value, n_directed),
-                          'num_of_nodes', 'networkType')
+    for dependent_variable in ['engagement_ratio', 'diffusion_rate']:
+      createMultipleBoxplots(results_n, 'networkType', 'num_of_nodes', dependent_variable,
+                             filename='networkType' + '_' + 'num_of_nodes' + '_' + dependent_variable)
 
       print('finished', 'networkType', 'num_of_nodes', dependent_variable)
 
@@ -76,12 +86,18 @@ def runNetworkComparison(n, i, mu, sigma, out_degree):
 
     results_degree.to_csv(path_data + 'out-degree_comparison.csv')
 
-    degree_undirected = results_degree[results_degree['networkType'] == NetworkType.Undirected.value]
-    degree_directed = results_degree[results_degree['networkType'] == NetworkType.Directed.value]
+    # degree_undirected = results_degree[results_degree['networkType'] == NetworkType.Undirected.value]
+    # degree_directed = results_degree[results_degree['networkType'] == NetworkType.Directed.value]
+    #
+    # multipleVariablesPlot(path_figure, (NetworkType.Undirected.value, degree_undirected),
+    #                       (NetworkType.Directed.value, degree_directed),
+    #                       'out_degree', 'networkType')
 
-    multipleVariablesPlot(path_figure, (NetworkType.Undirected.value, degree_undirected),
-                          (NetworkType.Directed.value, degree_directed),
-                          'in_degree', 'networkType')
+    for dependent_variable in ['engagement_ratio', 'diffusion_rate']:
+      createMultipleBoxplots(results_degree, 'networkType', 'out_degree', dependent_variable,
+                             filename='networkType' + '_' + 'out_degree' + '_' + dependent_variable)
+
+      print('finished', 'networkType', 'out_degree', dependent_variable)
 
   else:
     networkData = NetworkData()

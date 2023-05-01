@@ -21,6 +21,13 @@ class KnowledgeType(Enum):
   Neighbourhood = True
 
 
+def getComparisonValue(comparison_variable):
+  if comparison_variable == 'knowledge':
+    return [KnowledgeType.Network.value, KnowledgeType.Neighbourhood.value]
+  elif comparison_variable == 'networkType':
+    return [NetworkType.Undirected.value, NetworkType.Directed.value]
+
+
 class NetworkData:
   def __init__(self):
     """
