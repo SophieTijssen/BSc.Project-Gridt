@@ -28,6 +28,13 @@ def getComparisonValue(comparison_variable):
     return [NetworkType.Undirected.value, NetworkType.Directed.value]
 
 
+def getComparisonValueName(comparison_variable, value):
+  if comparison_variable == 'knowledge':
+    return KnowledgeType(value).name
+  elif comparison_variable == 'networkType':
+    return NetworkType(value).name
+
+
 class NetworkData:
   def __init__(self):
     """
@@ -36,10 +43,12 @@ class NetworkData:
     self.n = 0
     self.mu = None
     self.sigma = None
+    self.a = None
+    self.b = None
     self.network = None
     self.thresholds = []
 
-  def createNewNetwork(self, networkType, n, out_degree, distributionType, mu, sigma):
+  def createNewNetwork(self, networkType, n, out_degree, distributionType, mu, sigma, a, b):
     """
 
     :param networkType:
@@ -48,6 +57,8 @@ class NetworkData:
     :param distributionType:
     :param mu:
     :param sigma:
+    :param a:
+    :param b:
     """
     self.n = n
 
@@ -56,7 +67,7 @@ class NetworkData:
     if networkType == NetworkType.Undirected:
       self.convertNetwork()
 
-    self.generateNewThresholds(distributionType, mu, sigma)
+    self.generateNewThresholds(distributionType, mu, sigma, a, b)
 
     # print("directed: ", self.network)
 
@@ -67,18 +78,23 @@ class NetworkData:
     # print("Convert network is called")
     self.network = convertToUndirectedNetwork(self.network)
 
-  def generateNewThresholds(self, distributionType, mu, sigma):
+  def generateNewThresholds(self, distributionType, mu, sigma, a, b):
     """
 
     :param distributionType:
     :param mu:
     :param sigma:
+    :param a:
+    :param b:
     """
-    self.thresholds = createThresholds(distributionType, self.n, mu, sigma)
+    self.thresholds = createThresholds(distributionType, self.n, mu, sigma, a, b)
 
     if distributionType == DistributionType.NORMAL.value:
       self.mu = mu
       self.sigma = sigma
+    elif distributionType == DistributionType.BETA.value:
+      self.a = a
+      self.b = b
 
 
 def constrained_sum_sample_pos(n, total):

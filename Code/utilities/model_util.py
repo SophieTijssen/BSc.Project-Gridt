@@ -2,9 +2,12 @@ from enum import Enum
 import numpy as np
 
 
-sigmas = np.delete(np.linspace(0.0, 1.0, 11).round(decimals=2), 0)
+sigmas1 = np.delete(np.linspace(0.0, 1.0, 11).round(decimals=2), 0)
+sigmas2_tmp = np.linspace(0.0, 1.0, 101).round(decimals=2)
+sigmas2 = sigmas2_tmp[sigmas2_tmp >= 0.1]
 nums = range(10, 205, 5)
 out_degrees = range(1, 11, 1)
+beta_parameters = [(0.5, 0.5), (1, 2), (2, 1), (2, 2), (2, 8), (8, 2), (8, 8)]
 
 
 class RunType(Enum):
@@ -27,6 +30,28 @@ class State(Enum):
   COOPERATE = 1
 
 
+def getRuntypeName(run_type, return_type):
+  if run_type == RunType.Granovetter:
+    if return_type == 'name':
+      return run_type.name
+    if return_type == 'folder':
+      return 'granovetter'
+  elif run_type == RunType.KnowledgeComparison:
+    if return_type == 'name':
+      return 'Knowledge comparison'
+    if return_type == 'parameter':
+      return 'knowledge'
+    if return_type == 'folder':
+      return 'knowledge_comparison'
+  elif run_type == RunType.NetworkComparison:
+    if return_type == 'name':
+      return 'Network comparison'
+    if return_type == 'parameter':
+      return 'networkType'
+    if return_type == 'folder':
+      return 'network_comparison'
+
+
 def getVariableName(variable):
   if variable == 'knowledge':
     return 'Knowledge type'
@@ -39,9 +64,12 @@ def getVariableName(variable):
   elif variable == 'out_degree':
     return 'Out-degree'
   elif variable == 'engagement_ratio':
-    return 'Equilibrium'
-  elif variable == 'Step':
-    return 'Diffusion'
+    return 'Behaviour spread'
+  elif variable == 'diffusion_rate':
+    return 'Diffusion speed'
+  # TODO: Remove below statement
+  # elif variable == 'Step':
+  #   return 'Diffusion speed'
 
 
 def number_state(model, state):

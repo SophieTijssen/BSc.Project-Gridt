@@ -2,9 +2,9 @@ from mesa import Model, DataCollector
 from mesa.time import SimultaneousActivation
 from mesa.space import NetworkGrid
 
-from mesa_model.granovetter_agent import *
-from utilities.model_util import *
-from utilities.network_util import *
+from mesa_model.granovetter_agent import GranovetterAgent
+from utilities.model_util import calculate_engagement_ratio, State, number_cooperating
+from utilities.network_util import createDirectedNetwork, convertToUndirectedNetwork
 from utilities.threshold_util import createThresholds
 
 
@@ -58,7 +58,7 @@ class GranovetterModel(Model):
       G = convertToUndirectedNetwork(G)
 
     # Create agent thresholds.
-    thresholds = createThresholds(self.distributionType, self.num_of_nodes, self.mu, self.sigma)
+    thresholds = createThresholds(self.distributionType, self.num_of_nodes, self.mu, self.sigma, None, None)
 
     return G, thresholds
 

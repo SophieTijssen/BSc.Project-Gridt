@@ -1,12 +1,14 @@
 from mesa.batchrunner import batch_run
 from mesa_model.granovetter_model import GranovetterModel
 from mesa_model.neighbourhood_model import NeighbourhoodModel
-from results.plot_graphs import *
+from results.plot_graphs import showDegreeHistogram, singleRunPlot, plotDirectedGraph
 from utilities.model_util import RunType
 from utilities.network_util import NetworkData
 
+import pandas as pd
 
-def singleRun(run, n, network, knowledge, distribution, mu, sigma, out_degree, networkData, path, filename):
+
+def singleRun(run, n, network, knowledge, distribution, mu, sigma, a, b, out_degree, networkData, path, filename):
   """
   Run the model for a single iteration.
 
@@ -17,6 +19,8 @@ def singleRun(run, n, network, knowledge, distribution, mu, sigma, out_degree, n
   :param distribution: The distribution used for sampling the agent thresholds.
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
   :param sigma: The standard deviation of the threshold distribution (in case of a normal distribution).
+  :param a:
+  :param b:
   :param out_degree: The out-degree of all agents.
   :param networkData: An object to store the network that should be used (can be empty).
   :param path:
@@ -28,8 +32,8 @@ def singleRun(run, n, network, knowledge, distribution, mu, sigma, out_degree, n
                              mu=mu, sigma=sigma, out_degree=out_degree)
   else:
     model = NeighbourhoodModel(run=run, num_of_nodes=n, knowledge=knowledge, networkType=network,
-                               distributionType=distribution, mu=mu, sigma=sigma, out_degree=out_degree,
-                               networkData=networkData)
+                               distributionType=distribution, mu=mu, sigma=sigma, beta_parameters=(a, b),
+                               out_degree=out_degree, networkData=networkData)
 
   while model.running and model.schedule.steps < 100:
     model.step()
@@ -37,14 +41,14 @@ def singleRun(run, n, network, knowledge, distribution, mu, sigma, out_degree, n
   model.datacollector.collect(model)
   model_out = model.datacollector.get_model_vars_dataframe()
 
-  # plotDirectedGraph(model, filename)
+  # plotDirectedGraph(model)
 
   showDegreeHistogram(path, model.G, filename)
 
   singleRunPlot(path, model_out, filename)
 
 
-def batchRunGranovetter(n, i, network, distributions, mu, sigmas, out_degree):
+def batchRunGranovetter(n, i, network, distributions, mu, sigma, out_degree):
   """
   Run the model for multiple iterations (using BatchRun).
 
@@ -53,7 +57,7 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, out_degree):
   :param network: The type of network used for the model (directed/undirected).
   :param distributions: The distribution used for sampling the agent thresholds.
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
-  :param sigmas: A list containing the standard deviations of the threshold distributions
+  :param sigma: A list containing the standard deviations of the threshold distributions
                  for each iteration (in case of a normal distribution).
   :param out_degree: The out-degree of all agents.
   :return: A pandas dataframe containing the results/data from the DataCollector.
@@ -64,7 +68,7 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, out_degree):
     "networkType": network,
     "distributionType": distributions,
     "mu": mu,
-    "sigma": sigmas,
+    "sigma": sigma,
     "out_degree": out_degree,
   }
 
@@ -83,7 +87,7 @@ def batchRunGranovetter(n, i, network, distributions, mu, sigmas, out_degree):
   return results_df
 
 
-def batchRunNeighbourhood(run, n, i, network, knowledge, distribution, mu, sigma, out_degree, collectionPeriod=1):
+def batchRunNeighbourhood(run, n, i, network, knowledge, distribution, mu, sigma, beta_parameters, out_degree, collectionPeriod=1):
   """
   Run the model for multiple iterations (using BatchRun).
 
@@ -96,6 +100,7 @@ def batchRunNeighbourhood(run, n, i, network, knowledge, distribution, mu, sigma
   :param mu: The mean of the threshold distribution (in case of a normal distribution).
   :param sigma: A list containing the standard deviations of the threshold distributions
                  for each iteration (in case of a normal distribution).
+  :param beta_parameters:
   :param out_degree: The out-degree of all agents.
   :param collectionPeriod:
   :return: A pandas dataframe containing the results/data from the DataCollector.
@@ -107,6 +112,7 @@ def batchRunNeighbourhood(run, n, i, network, knowledge, distribution, mu, sigma
     "out_degree": out_degree,
     "mu": mu,
     "sigma": sigma,
+    "beta_parameters": beta_parameters,
     "networkType": network,
     "knowledge": knowledge,
     "distributionType": distribution,

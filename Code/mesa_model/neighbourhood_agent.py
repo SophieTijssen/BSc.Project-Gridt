@@ -1,5 +1,5 @@
 from mesa_model.granovetter_agent import GranovetterAgent
-from utilities.model_util import *
+from utilities.model_util import State, number_cooperating
 
 
 class NeighbourhoodAgent(GranovetterAgent):
@@ -49,6 +49,7 @@ class NeighbourhoodAgent(GranovetterAgent):
 
     else:  # Let agents only see their neighbourhood
       neighbourhood = self.model.grid.get_neighbors(self.pos, include_center=False)
+      # print(len(neighbourhood))
 
       if len(neighbourhood) > 0:
         cooperating_neighbours = len([neighbour for neighbour in self.model.grid.get_cell_list_contents(neighbourhood)

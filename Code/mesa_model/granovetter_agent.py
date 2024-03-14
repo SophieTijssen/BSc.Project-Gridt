@@ -1,6 +1,6 @@
 from mesa import Agent
 
-from utilities.model_util import *
+from utilities.model_util import State, number_cooperating
 
 
 class GranovetterAgent(Agent):
